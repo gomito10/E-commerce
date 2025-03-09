@@ -1,6 +1,6 @@
 'use client'
-import {useState} from 'react'
-import {AppBar,Toolbar,Typography,IconButton,TextField,Box,Drawer,ListSubheader,List,ListItem,ListItemButton,ListItemText,ListItemSecondaryAction} from '@mui/material';
+import {useState,useEffect} from 'react'
+import {AppBar,Toolbar,Typography,IconButton,TextField,Box,Drawer,ListSubheader,List,ListItem,ListItemButton,ListItemText,ListItemSecondaryAction,Badge} from '@mui/material';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
@@ -11,7 +11,11 @@ function Appbar(){
   const[open,setOpen]=useState(false);
   const router=useRouter();
   const categorias=["electronics","jewelery","men's clothing","women's clothing"];
-
+const[show,setShow]=useState(false);
+const[cart,setCart]=useState(localStorage.length);
+function handleShow(){
+  setShow(!open);
+}
   return(
     <>
       <AppBar position="static" sx={{backgroundColor:"white"}}>
@@ -26,7 +30,9 @@ function Appbar(){
           </IconButton>
           <Typography variant="body1" color="initial">Mi Cuenta</Typography>
           <IconButton>
+            <Badge badgeContent={cart} onClick={handleShow}>
             <ShoppingCartOutlinedIcon/>
+            </Badge>
           </IconButton>
           </Box>
           <TextField variant="outlined" color="success" fullWidth/>
@@ -58,6 +64,18 @@ function Appbar(){
             </ListItem>
             ))
             }
+        </List>
+      </Drawer>
+      <button onClick={()=>localStorage.clear()}>click</button>
+      <Drawer open={show} onClose={()=>setShow(!show)}>
+        <List>
+          
+            <ListItem>
+              {
+                
+              }
+            </ListItem>
+          
         </List>
       </Drawer>
     </>

@@ -1,6 +1,5 @@
-
 import {Box,Typography,Autocomplete,TextField,Container,Grid2,Card,CardMedia,CardContent,CardActions,Button,CardActionArea} from '@mui/material';
-import Boton from "./Boton";
+import Boton from './Boton'
 import Link from 'next/link'
 async function LoadProducts(){
   const response=await fetch("https://fakestoreapi.com/products")
@@ -15,8 +14,8 @@ const Home= async ()=>{
     <Container>
     <Grid2 container spacing={2}>
      {
-       fetchData.map((prod)=>(
-          <Grid2 size={{xs:6,sm:3}} key={prod.id}>
+       fetchData.map((prod,index)=>(
+          <Grid2 size={{xs:6,sm:3}} key={index}>
             <Card sx={{width:"100%",height:"300px"}}
             elevation={12}
             >
@@ -40,7 +39,7 @@ const Home= async ()=>{
               </CardContent>
               </Link>
               <CardActions>
-                <Button variant="contained" color="error" fullWidth>Agregar</Button>
+                <Boton producto={prod.title} id={JSON.stringify(prod[index])}/>
               </CardActions>
             </Card>
           </Grid2>

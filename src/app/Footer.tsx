@@ -4,7 +4,7 @@ import {React} from 'react'
 function Footer(){
   return(
     <>
-    <Container sx={{mt:2}}>
+    <Container sx={{mt:2,pb:5}}>
       <Typography variant="h4" color="initial" className="font-bold" sx={{fontStyle:"italic"}}>CITYTOUR</Typography>
       <Box>
       <Box component="section">

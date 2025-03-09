@@ -3,7 +3,7 @@
 export default function Error(){
   return (
     <>
-      <h1>Error en el servidor</h1>
+      <h1>Error en mi servidor</h1>
     </>
   )
 }

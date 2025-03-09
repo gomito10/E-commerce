@@ -106,7 +106,7 @@ async function Description({params}){
         <Paper>
         <Typography variant="h4" color="initial" className="font-bold">${product.price}</Typography>
         <Typography variant="body2" className="text-green-700">18 cuotas sin interés de ${(product.price/18).toFixed(2)}</Typography>
-      <Button variant="contained" color="secondary" fullWidth className="my-2" size="large">Comprar</Button>
+      <Button variant="contained" color="secondary" fullWidth sx={{margin:"10px 0"}} size="large">Comprar</Button>
       <Button variant="contained" className="bg-purple-200 text-purple-800" fullWidth size="large">agregar al carrito</Button>
       </Paper>
       </Container>
