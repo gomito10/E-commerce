@@ -4,6 +4,7 @@ import Appbar from "./Appbar"
 import Footer from "./Footer"
 import "./globals.css";
 import "./global.css"
+import {CountCart} from './crearContexto'
 import {IconButton,Typography} from '@mui/material'
 import KeyboardBackspaceOutlinedIcon from '@mui/icons-material/KeyboardBackspaceOutlined';
 const geistSans = Geist({
@@ -34,9 +35,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <CountCart>
       <Appbar/>
         <main>{children}</main>
       <Footer/>
+      </CountCart>
       </body>
     </html>
   );

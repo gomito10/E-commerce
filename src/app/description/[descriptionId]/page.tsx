@@ -1,8 +1,10 @@
 import {Card,CardMedia,CardContent,CardActions,Typography,Button,Divider,IconButton,Container,CardActionArea,Box,Grid2,Paper} from '@mui/material';
+import Productos from '../../productos/page'
 import Link from 'next/link'
 import Image from "next/image"
 import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
+import Boton from '../../Boton'
 async function LoadDescription(id){
   const response=await fetch(`https://fakestoreapi.com/products/${id}`)
   const data=await response.json()
@@ -60,41 +62,8 @@ async function Description({params}){
       </Container>
       <Box className="bg-gray-100" sx={{width:"100%"}}>
         <Typography variant="body1" color="initial" className="font-bold m-4">Personas interesadas en este producto también vieron</Typography>
-          <Box sx={{display:"flex",overflow:"hidden",overflowX:"auto"}} className="bg-gray-100" >
-            {
-            seleccion.map((visto)=>(
-                <Card sx={{width:"40%",height:"300px",mx:1,flexShrink:0}} elevation={3} variant="outlined">
-                <CardActionArea>
-                <Link href={`/description/${visto.id}`}>
-                  <CardMedia
-                  component="img"
-                  image={visto.image}
-                  height="150px"
-                  alt={visto.title}
-                  sx={{
-                    width:"50%",
-                    height:"150px",
-                    objectFit:"contain",
-                    margin:"10px auto",
-                    display:"block"
-                  }}
-                  />
-                  <CardContent>
-                    <Typography variant="body2" color="initial" className="truncate">{visto.title}</Typography>
-                    <Typography variant="body2" color="initial" className="font-bold">${visto.price}</Typography>
-                  </CardContent>
-                  </Link>
-                  </CardActionArea>
-                  <CardActions>
-                    <Button variant="contained"
-                   color="error" fullWidth>
-                   Agregar
-                   </Button>
-                   </CardActions>
-                </Card>
-            ))
-
-            }
+          <Box sx={{display:"flex",overflow:"hidden",overflowX:"auto"}} className="bg-gray-100">
+            <Productos y={`products/category/${product.category}`}/>
         </Box>
       <Typography variant="h5" className="font-bold text-center my-4" color="inigial">Descripción</Typography>
       <Typography variant="body1" color="initial" sx={{textAlign:"center"}} className="m-5">
@@ -107,7 +76,7 @@ async function Description({params}){
         <Typography variant="h4" color="initial" className="font-bold">${product.price}</Typography>
         <Typography variant="body2" className="text-green-700">18 cuotas sin interés de ${(product.price/18).toFixed(2)}</Typography>
       <Button variant="contained" color="secondary" fullWidth sx={{margin:"10px 0"}} size="large">Comprar</Button>
-      <Button variant="contained" className="bg-purple-200 text-purple-800" fullWidth size="large">agregar al carrito</Button>
+      <Boton nombre={product.title} producto={product}/>
       </Paper>
       </Container>
     </Box>

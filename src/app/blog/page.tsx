@@ -1,14 +1,5 @@
-"use client";
+
 //import type { Metadata } from "next";
-import {
-    useState,
-    useRef,
-    useEffect,
-    forwardRef,
-    createContext,
-    useContext
-} from "react";
-import { useForm } from "react-hook-form";
 import {
     Button,
     List,
@@ -58,16 +49,25 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 const names = ["luis", "maru", "mili", "leon", "cielo"];
 
-
+function LoadProducts(){
+  fetch("https://fakestoreapi.com/products")
+  .then(response=>response.json())
+  .then(data=>data)
+  .catch(error=>console.error("Error en la solicitud",error.message))
+}
   
-function Blog() {
-  const[carro,setCarro]=useState("");
+async function Blog() {
+  const productos=await LoadProducts();
     return (
         <>
             <Container>
-              <button onClick={()=>localStorage.setItem("carro","producto")}>click</button>
-              <button onClick={()=>setCarro(localStorage.getItem("cart"))}>obtener</button>
-              <h1>{carro}</h1>
+              <ul>
+              {
+                productos.map((item)=>(
+                  <li>{item.title}</li>
+                ))
+              }
+              </ul>
             </Container>
             
         </>
