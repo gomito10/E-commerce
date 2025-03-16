@@ -28,7 +28,7 @@ function Aagregar({onSuma,onResta,miTotal}){
   }
   useEffect(()=>{
     setTotal(miTotal*count)
-  },[count])
+  },[count,miTotal])
   return(
       <>
         <Box className="flex gap-2">
@@ -41,6 +41,8 @@ function Aagregar({onSuma,onResta,miTotal}){
     )
 }
 function Appbar(){
+  const[search,setSearch]=useState("");
+  const[cart,setCart]=useState(0);
   const{countCart,setCountCart}=useContext(crearContexto)
   const[itemId,setItemId]=useState([])
   const[precio,setPrecio]=useState(null);
@@ -93,16 +95,21 @@ function handleDelete(titulo,indice,valor){
   setItemId(itemId.filter((products,index)=>indice!==index));
   localStorage.removeItem(titulo)
   setTotal(t=>t-valor)
+  setCountCart(countCart-1)
 }
 useEffect(()=>{
   for(let i=0; i<localStorage.length;i++){
     const items=JSON.parse(localStorage.getItem(localStorage.key(i)))
     array.push(items)
     misPrecios.push(items.price)
+    
   }
   setItemId(array)
   setPrecios(misPrecios)
-},[precios])
+},[countCart])
+function handleInput(){
+  alert("luis")
+}
   return(
     <>
       <AppBar position="static" sx={{backgroundColor:"white"}}>
@@ -117,12 +124,12 @@ useEffect(()=>{
           </IconButton>
           <Typography variant="body1" color="initial">Mi Cuenta</Typography>
           <IconButton>
-            <Badge badgeContent={localStorage.getItem("countCarrito")} onClick={handleShow}>
+            <Badge badgeContent={precios.length} onClick={handleShow}>
             <ShoppingCartOutlinedIcon/>
             </Badge>
           </IconButton>
           </Box>
-          <TextField variant="outlined" color="success" fullWidth/>
+          <TextField variant="outlined" color="success" fullWidth onChange={(e)=>setSearch(e.target.value)} onInput={handleInput}/>
           </Box>
         </Toolbar>
       </AppBar>
