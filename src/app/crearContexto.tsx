@@ -1,10 +1,12 @@
 'use client'
 
-import {createContext,useState} from 'react';
+import {createContext,useEffect,useState} from 'react';
 
 const crearContexto=createContext();
 function CountCart({children}){
   const[countCart,setCountCart]=useState(0);
+  
+  
   return(
       <>
         <crearContexto.Provider value={{countCart,setCountCart}}>

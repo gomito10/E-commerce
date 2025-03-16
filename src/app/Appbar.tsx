@@ -30,18 +30,20 @@ function Aagregar({onSuma,onResta,miTotal}){
     setTotal(miTotal*count)
   },[count,miTotal])
   return(
-      <>
-        <Box className="flex gap-2">
+    <>
+      <Box sx={{width:"100%"}}>
+       <Typography variant="h5" className="font-extrabold mr-3">${total && total.toFixed(2)}</Typography>
+        <Box className="flex gap-2 justify-center">
         <Button variant="outlined" size="small" color="secondary" onClick={()=>handleSuma()}>+</Button>
          <Typography>{count}</Typography>
-        <Button variant="outlined" color="success" onClick={()=>handleResta()} size="small">-</Button>
-        <Typography variant="h5" className="font-extrabold">${total && total.toFixed(2)}</Typography>
+        <Button variant="outlined" color="secondary" onClick={()=>handleResta()} size="small">-</Button>
         </Box>
+      </Box>
       </>
     )
 }
 function Appbar(){
-  const[search,setSearch]=useState("");
+  const[search,setSearch]=useState("")
   const[cart,setCart]=useState(0);
   const{countCart,setCountCart}=useContext(crearContexto)
   const[itemId,setItemId]=useState([])
@@ -107,9 +109,17 @@ useEffect(()=>{
   setItemId(array)
   setPrecios(misPrecios)
 },[countCart])
-function handleInput(){
-  alert("luis")
+function handleSearch(e){
+  setSearch(e.target.value);
+  
 }
+
+useEffect(() => {
+  const categoriavalida=categorias.find((item)=>item.startsWith(search))
+  if (search && categoriavalida) {
+    router.push(`/categorias/${categoriavalida}`);
+  }
+}, [search,router]);
   return(
     <>
       <AppBar position="static" sx={{backgroundColor:"white"}}>
@@ -129,7 +139,7 @@ function handleInput(){
             </Badge>
           </IconButton>
           </Box>
-          <TextField variant="outlined" color="success" fullWidth onChange={(e)=>setSearch(e.target.value)} onInput={handleInput}/>
+          <TextField variant="outlined" color="success" fullWidth onChange={handleSearch} value={search}/>
           </Box>
         </Toolbar>
       </AppBar>
@@ -162,7 +172,7 @@ function handleInput(){
       <Drawer open={show} onClose={()=>setShow(!show)}
       PaperProps={{
         sx:{
-          width:"75%",
+          width:{xs:"75%",sm:"50%"},
         }
       }}
       >
@@ -197,7 +207,7 @@ function handleInput(){
               <Typography variant="body1" sx={{fontWeight:"bold"}}>${item.price}</Typography>
               <DeleteOutlineIcon color="primary" onClick={()=>handleDelete(item.title,index,item.price)}/>
             </CardContent>
-            <CardActions sx={{clear:"both"}}>
+            <CardActions className='text-center'>
               <Aagregar onResta={()=>handleResta(item.price)} onSuma={()=>handleSuma(item.price)} miTotal={item.price}/>
             </CardActions>
             <Divider/>
