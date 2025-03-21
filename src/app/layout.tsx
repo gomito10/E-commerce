@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import {useRouter} from "next/navigation"
 import Appbar from "./Appbar"
 import Footer from "./Footer"
 import "./globals.css";
@@ -36,9 +37,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <CountCart>
-      <Appbar/>
         <main>{children}</main>
-      <Footer/>
       </CountCart>
       </body>
     </html>

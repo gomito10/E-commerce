@@ -30,20 +30,18 @@ function Aagregar({onSuma,onResta,miTotal}){
     setTotal(miTotal*count)
   },[count,miTotal])
   return(
-    <>
-      <Box sx={{width:"100%"}}>
-       <Typography variant="h5" className="font-extrabold mr-3">${total && total.toFixed(2)}</Typography>
-        <Box className="flex gap-2 justify-center">
+      <>
+        <Box className="flex gap-2">
         <Button variant="outlined" size="small" color="secondary" onClick={()=>handleSuma()}>+</Button>
          <Typography>{count}</Typography>
-        <Button variant="outlined" color="secondary" onClick={()=>handleResta()} size="small">-</Button>
+        <Button variant="outlined" color="success" onClick={()=>handleResta()} size="small">-</Button>
+        <Typography variant="h5" className="font-extrabold">${total && total.toFixed(2)}</Typography>
         </Box>
-      </Box>
       </>
     )
 }
 function Appbar(){
-  const[search,setSearch]=useState("")
+  const[search,setSearch]=useState("");
   const[cart,setCart]=useState(0);
   const{countCart,setCountCart}=useContext(crearContexto)
   const[itemId,setItemId]=useState([])
@@ -109,17 +107,9 @@ useEffect(()=>{
   setItemId(array)
   setPrecios(misPrecios)
 },[countCart])
-function handleSearch(e){
-  setSearch(e.target.value);
-  
+function handleInput(){
+  alert("luis")
 }
-
-useEffect(() => {
-  const categoriavalida=categorias.find((item)=>item.startsWith(search))
-  if (search && categoriavalida) {
-    router.push(`/categorias/${categoriavalida}`);
-  }
-}, [search,router]);
   return(
     <>
       <AppBar position="static" sx={{backgroundColor:"white"}}>
@@ -139,7 +129,7 @@ useEffect(() => {
             </Badge>
           </IconButton>
           </Box>
-          <TextField variant="outlined" color="success" fullWidth onChange={handleSearch} value={search}/>
+          <TextField variant="outlined" color="success" fullWidth onChange={(e)=>setSearch(e.target.value)} onInput={handleInput}/>
           </Box>
         </Toolbar>
       </AppBar>
@@ -168,11 +158,10 @@ useEffect(() => {
             }
         </List>
       </Drawer>
-      <button onClick={()=>localStorage.clear()}>click</button>
       <Drawer open={show} onClose={()=>setShow(!show)}
       PaperProps={{
         sx:{
-          width:{xs:"75%",sm:"50%"},
+          width:"75%",
         }
       }}
       >
@@ -207,7 +196,7 @@ useEffect(() => {
               <Typography variant="body1" sx={{fontWeight:"bold"}}>${item.price}</Typography>
               <DeleteOutlineIcon color="primary" onClick={()=>handleDelete(item.title,index,item.price)}/>
             </CardContent>
-            <CardActions className='text-center'>
+            <CardActions sx={{clear:"both"}}>
               <Aagregar onResta={()=>handleResta(item.price)} onSuma={()=>handleSuma(item.price)} miTotal={item.price}/>
             </CardActions>
             <Divider/>

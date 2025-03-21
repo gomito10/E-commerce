@@ -49,25 +49,17 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 const names = ["luis", "maru", "mili", "leon", "cielo"];
 
-function LoadProducts(){
-  fetch("https://fakestoreapi.com/products")
-  .then(response=>response.json())
-  .then(data=>data)
-  .catch(error=>console.error("Error en la solicitud",error.message))
-}
-  
+  async function LoadData(){
+    const response=await fetch("http://localhost:4000")
+    const data=response.json()
+    return data
+  }
 async function Blog() {
-  const productos=await LoadProducts();
+  const fetchFata=await LoadData()
     return (
         <>
             <Container>
-              <ul>
-              {
-                productos.map((item)=>(
-                  <li>{item.title}</li>
-                ))
-              }
-              </ul>
+              <Typography>{fetchFata.message}</Typography>
             </Container>
             
         </>

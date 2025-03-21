@@ -7,7 +7,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import Link from "next/link"
-import {useRef,forwardRef,useState} from "react";
+import {useRef,forwardRef,useState,useEffect} from "react";
 import {useForm} from "react-hook-form"
  function NewDirection(){
    const{
@@ -160,6 +160,15 @@ async function handleChange(){
 }
 const MisDatos=forwardRef((props,ref)=>{
   const[open,setOpen]=useState(false);
+  const[data,setData]=useState({});
+  useEffect(()=>{
+    const fetchData=async()=>{
+      const response=await fetch("http://localhost:4000/tokens");
+      const dato=await response.json();
+      setData(dato);
+    }
+    fetchData();
+  },[])
   function handleBack(){
     document.getElementById("datos").scrollIntoView({behavior:"smooth",block:"center"})
     window.scrollTo(0,0)
@@ -176,31 +185,31 @@ const MisDatos=forwardRef((props,ref)=>{
             <ListItem>
               <ListItemText>
                 <Typography variant="body1" color="initial" className="font-bold">Nombre</Typography>
-                <Typography variant="body2" className="text-gray-500">Luis</Typography>
+                <Typography variant="body2" className="text-gray-500">{data.usuario}</Typography>
               </ListItemText>
               </ListItem>
                           <ListItem>
               <ListItemText>
                 <Typography variant="body1" color="initial" className="font-bold">Apellido</Typography>
-                <Typography variant="body2" className="text-gray-500">Gómez</Typography>
+                <Typography variant="body2" className="text-gray-500">{data.apellido}</Typography>
               </ListItemText>
               </ListItem>
             <ListItem>
               <ListItemText>
                 <Typography variant="body1" color="initial" className="font-bold">Email</Typography>
-                <Typography variant="body2" className="text-gray-500">gomito724@gmail.com</Typography>
+                <Typography variant="body2" className="text-gray-500">{data.email}</Typography>
               </ListItemText>
               </ListItem>
             <ListItem>
               <ListItemText>
                 <Typography variant="body1" color="initial" className="font-bold">Dni</Typography>
-                <Typography variant="body2" className="text-gray-500">28280639</Typography>
+                <Typography variant="body2" className="text-gray-500">{data.documento}</Typography>
               </ListItemText>
               </ListItem>
             <ListItem>
               <ListItemText>
                 <Typography variant="body1" color="initial" className="font-bold">Teléfono</Typography>
-                <Typography variant="body2" className="text-gray-500">1155606321</Typography>
+                <Typography variant="body2" className="text-gray-500">{data.telefono}</Typography>
               </ListItemText>
               </ListItem>
           </List>
