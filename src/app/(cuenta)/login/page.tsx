@@ -5,15 +5,27 @@ import {useRouter} from 'next/navigation'
 import {useState} from 'react'
 export default function Login(){
   const router=useRouter();
-  const[error,setError]=useState(false)
+  
   const{
     register,
     handleSubmit,
     watch,
-    formState:{errors}
+    formState:{errors},
+    setError
   }=useForm()
-  function onSubmit(data){
-    alert(data.username)
+ async function onSubmit(data){
+    const response=await fetch("http://localhost:4000/login",{
+      method:"POST",
+      headers:{
+        "Content-Type":"spplication/json"
+      },
+      body:JSON.sytringify(data)
+    });
+    const result=response.json(data);
+    if(!result.ok){
+      setError("paasword",{message:result.message})
+    }
+    
   }
   function handleRegister(){
     router.push("/register")
@@ -29,10 +41,11 @@ export default function Login(){
     helperText={errors.username && errors.username.message}
     label="username"
     variant="outlined"
-    color={error ? "error" : "info"}
+    color={errors ? "error" : "info"}
     fullWidth
     error={errors.username}
     />
+  
     <TextField
     {...register("password",{
       required:"El campo debe estar completo"
@@ -40,11 +53,12 @@ export default function Login(){
     helperText={errors.password && errors.password.message}
     label="password"
     variant="outlined"
-    color={error ? "error" : "info"}
+    color={errors ? "error" : "info"}
     error={errors.password}
     fullWidth
     sx={{margin:"10px 0"}}
     />
+    {errors.password && errors.password.message}
     <Button variant="contained" color="error" fullWidth type="submit" sx={{padding:"15px 0"}}>Iniciar sesión</Button>
     <FormControlLabel control={<Checkbox color="error"/>} label="Recordarme" sx={{color:"red"}}/>
     </form>

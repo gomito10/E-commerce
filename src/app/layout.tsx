@@ -37,7 +37,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <CountCart>
+          <Appbar />
         <main>{children}</main>
+          <Footer/>
       </CountCart>
       </body>
     </html>

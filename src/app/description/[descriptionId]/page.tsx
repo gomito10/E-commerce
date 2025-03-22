@@ -1,4 +1,5 @@
 import {Card,CardMedia,CardContent,CardActions,Typography,Button,Divider,IconButton,Container,CardActionArea,Box,Grid2,Paper} from '@mui/material';
+import Compra from '../../comprar'
 import Productos from '../../productos/page'
 import Link from 'next/link'
 import Image from "next/image"
@@ -75,7 +76,7 @@ async function Description({params}){
         <Paper>
         <Typography variant="h4" color="initial" className="font-bold">${product.price}</Typography>
         <Typography variant="body2" className="text-green-700">18 cuotas sin interés de ${(product.price/18).toFixed(2)}</Typography>
-      <Button variant="contained" color="secondary" fullWidth sx={{margin:"10px 0"}} size="large">Comprar</Button>
+      <Compra/>
       <Boton nombre={product.title} producto={product}/>
       </Paper>
       </Container>

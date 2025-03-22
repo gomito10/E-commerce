@@ -107,9 +107,15 @@ useEffect(()=>{
   setItemId(array)
   setPrecios(misPrecios)
 },[countCart])
-function handleInput(){
-  alert("luis")
+function handleSearch(e){
+  setSearch(e.target.value)
 }
+useEffect(()=>{
+  const filtrar=categorias.find((item)=>item.startsWith(search.toLowerCase()));
+  if(search){
+    router.push(`/categorias/${filtrar}`)
+  }
+},[search])
   return(
     <>
       <AppBar position="static" sx={{backgroundColor:"white"}}>
@@ -129,7 +135,7 @@ function handleInput(){
             </Badge>
           </IconButton>
           </Box>
-          <TextField variant="outlined" color="success" fullWidth onChange={(e)=>setSearch(e.target.value)} onInput={handleInput}/>
+          <TextField variant="outlined" color="success" fullWidth onChange={handleSearch} value={search}/>
           </Box>
         </Toolbar>
       </AppBar>
