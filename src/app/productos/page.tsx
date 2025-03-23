@@ -22,7 +22,7 @@ const Productos= ({y})=>{
             <Card sx={{width:"100%",height:"300px"}}
             elevation={12}
             >
-            <Link href={`/description/${prod.id}`}>
+            <Link href={`../description/${prod.id}`}>
               <CardMedia
               component="img"
               image={prod.image}

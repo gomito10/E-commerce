@@ -1,6 +1,6 @@
 "use client"
 import {useEffect,useState} from "react"
-import {Card,CardHeader,CardContent,CardActions,Typography,Container,Button,Link,IconButton,Box} from '@mui/material'
+import {Card,CardHeader,CardContent,CardActions,Typography,Container,Button,Link,IconButton,Box, Grid2} from '@mui/material'
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import QuestionMarkOutlinedIcon from '@mui/icons-material/QuestionMarkOutlined';
@@ -11,6 +11,8 @@ const Cuenta = () => {
     <Container className="bg-gray-100">
       <Typography>{pathname}</Typography>
     <Typography variant="h5" className="font-extrabold mb-4 pt-5">Mi Cuenta</Typography>
+    <Grid2 container spacing={1}>
+      <Grid2 size={{xs:12,sm:4}}>
     <Card>
       <CardContent className="flex">
         <Box sx={{borderRadius:"50%"}}>
@@ -28,7 +30,9 @@ const Cuenta = () => {
       </CardContent>
 
     </Card>
-        <Card className="my-5">
+    </Grid2>
+      <Grid2 size={{xs:12,sm:4}}>
+        <Card>
       <CardContent className="flex">
         <Box sx={{borderRadius:"50%"}}>
         <IconButton className="bg-gray-200">
@@ -46,6 +50,8 @@ const Cuenta = () => {
       </CardContent>
 
     </Card>
+    </Grid2>
+    <Grid2 size={{xs:12,sm:4}}>
         <Card>
       <CardContent className="flex">
         <Box sx={{borderRadius:"50%"}}>
@@ -64,6 +70,8 @@ const Cuenta = () => {
       </CardContent>
 
     </Card>
+    </Grid2>
+    </Grid2>
     </Container>
   )
 }

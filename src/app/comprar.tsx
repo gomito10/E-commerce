@@ -4,7 +4,7 @@ import {useRouter} from 'next/navigation';
 function Compra(){
   const router=useRouter();
   function handleClick(){
-    router.push("http://localhost:4000/compra")
+    router.push("http://localhost:4000/compras")
   }
   return(
      <>

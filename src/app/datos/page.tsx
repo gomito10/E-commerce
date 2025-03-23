@@ -20,7 +20,7 @@ import {useForm} from "react-hook-form"
          <Typography variant="body1" color="initial" className="font-extrabold">Añadir dirección</Typography>
            <form>
             <FormControl fullWidth>
-             <InputLabel htmlFor="pais" className="font-bold my-3">País</InputLabel>
+             <InputLabel className="font-bold my-3">País</InputLabel>
             <NativeSelect
             value="Argentina"
             id="pais"
@@ -39,7 +39,7 @@ import {useForm} from "react-hook-form"
               <option value="Argentina">Argentina</option>
             </NativeSelect>
           </FormControl>
-           <InputLabel htmlFor="postal" className="font-bold mt-5">Código postal</InputLabel>
+           <InputLabel className="font-bold mt-5">Código postal</InputLabel>
            <TextField {...register("postal")} variant="outlined" color="primary" fullWidth/>
            <Link href="#" className="my-5">
              <Typography variant="body2" color="primary">No conozco mi código postal</Typography>

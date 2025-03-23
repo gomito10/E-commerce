@@ -85,17 +85,17 @@ router.post("/register",[
     ],async (req,res)=>{
       const errors=validationResult(req);
       if(!errors.isEmpty()){
-        return res.status(409).json({errors:errors.array()})
+        return res.status(400).json({errors:errors.array()})
       }
       try{
         const{usuario,password}=req.body;
         const username=await User.findOne({usuario});
         if(!username){
-          return res.status(400).json({error:"USER_NOT_FOUND",message:"contraseña o password incorrecto"})
+          return res.status(400).json({error:"USER_NOT_FOUND",message:"contraseña o password incorrecto",user:usuario})
         }
         const miPassword=await bcrypt.compare(password,username.password);
         if(!miPassword){
-          return res.status(400).json({error:"INVALID_PASSWORD",message:"contraseña o usuario incorrecto",miError:username.password})
+          return res.status(400).json({error:"INVALID_PASSWORD",message:"contraseña o usuario incorrecto",miError:password})
         }
         const token=jwt.sign({usuario:username.usuario},"secreto",{expiresIn:"15m"});
         const refreshToken=jwt.sign({usuario:username.usuario},"refresco",{expiresIn:"7d"});
@@ -120,15 +120,15 @@ router.post("/register",[
     }
     )
     const autenticationToken=(req,res,next)=>{
-      const autHeader=req.headers["authorization"];
-      const token=autHeader && autHeader.split(" ")[1];
+      //const autHeader=req.headers["authorization"];
+      //const token=autHeader && autHeader.split(" ")[1];
       const accessToken=req.cookies.token;
       if(!accessToken){
-        return res.status(400).json({message:"El token no existe"})
+        return res.status(400).json({error:"NO_TOKEN",message:"El token no existe"})
       }
       jwt.verify(accessToken,"secreto",(err,user)=>{
         if(err){
-          return res.status(403).json({error:"Token invalido"})
+          return res.status(403).json({error:"INVALID_TOKEN",message:"Token invalido"})
         }
         req.user=user;
         next()
@@ -253,7 +253,7 @@ router.post("/register",[
           nombre:user.nombre,apellido:user.apellido,telefono:user.telefono,documento:user.dni,email:user.email
         })
       })
-    router.get("/compra",autenticationToken,(req,res)=>{
+    router.get("/compras",autenticationToken,(req,res)=>{
       res.json({message:"compra exitosa"})
     })
 
