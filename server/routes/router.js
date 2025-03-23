@@ -85,17 +85,21 @@ router.post("/register",[
     ],async (req,res)=>{
       const errors=validationResult(req);
       if(!errors.isEmpty()){
-        return res.status(409).json({errors:errors.array()})
+        return res.status(400).json({errors:errors.array()})
       }
       try{
         const{usuario,password}=req.body;
         const username=await User.findOne({usuario});
         if(!username){
-          return res.status(400).json({error:"USER_NOT_FOUND",message:"contraseña o password incorrecto"})
+          return res.status(400).json({error:"USER_NOT_FOUND",message:"contraseña o password incorrecto",user:usuario})
         }
         const miPassword=await bcrypt.compare(password,username.password);
         if(!miPassword){
+<<<<<<< HEAD
           return res.status(400).json({error:"INVALID_PASSWORD",message:"contraseña o usuario incorrecto"})
+=======
+          return res.status(400).json({error:"INVALID_PASSWORD",message:"contraseña o usuario incorrecto",miError:password})
+>>>>>>> 3dde271f8c48691be7ac3abdf38a9a2c887aa755
         }
         const token=jwt.sign({usuario:username.usuario},"secreto",{expiresIn:"40s"});
         const refreshToken=jwt.sign({usuario:username.usuario},"refresco",{expiresIn:"7d"});
@@ -120,18 +124,30 @@ router.post("/register",[
     }
     )
     const autenticationToken=(req,res,next)=>{
+<<<<<<< HEAD
       const autHeader=req.headers["authorization"];
       const token=autHeader && autHeader.split(" ")[1];
       //const accessToken=req.cookies.token;
       if(!token){
         return res.status(400).json({message:"El token no existe"})
+=======
+      //const autHeader=req.headers["authorization"];
+      //const token=autHeader && autHeader.split(" ")[1];
+      const accessToken=req.cookies.token;
+      if(!accessToken){
+        return res.status(400).json({error:"NO_TOKEN",message:"El token no existe"})
+>>>>>>> 3dde271f8c48691be7ac3abdf38a9a2c887aa755
       }
       jwt.verify(token,"secreto",(err,user)=>{
         if(err){
+<<<<<<< HEAD
           if(err.name==="TokenExpiredError"){
           return res.status(403).json({error:"Token expirado"})
         }else{
           return res.status(403).json({error:"Token invalido"})
+=======
+          return res.status(403).json({error:"INVALID_TOKEN",message:"Token invalido"})
+>>>>>>> 3dde271f8c48691be7ac3abdf38a9a2c887aa755
         }
         req.user=user;
         next()

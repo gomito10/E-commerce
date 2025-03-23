@@ -7,6 +7,7 @@ function Compra(){
   const{token,refreshToken}=useContext(crearContexto);
   const router=useRouter();
   function handleClick(){
+<<<<<<< HEAD
 const getProtecredData=async ()=>{
         try{
     const response=await fetch("http://localhost:4000/compras",{
@@ -60,6 +61,9 @@ const getProtecredData=async ()=>{
     
   }
   getProtecredData()
+=======
+    router.push("http://localhost:4000/compras")
+>>>>>>> 3dde271f8c48691be7ac3abdf38a9a2c887aa755
   }
   return(
      <>

@@ -1,11 +1,16 @@
 const express=require("express");
-require("./dataBase/connectDb.js")
+require("./dataBase/connectDb.js");
+const cookieParser=require("cookie-parser")
 const authRouter=require("./routes/router.js")
 const cors=require("cors")
 const app=express()
-app.use(express.urlencoded({extended:true}))
-app.use(cors());
 app.use(express.json())
+app.use(express.urlencoded({extended:true}))
+app.use(cookieParser())
+app.use(cors({
+    origin:"http://localhost:3000",
+    credentials:true
+}));
 app.use("/",authRouter)
 
 
