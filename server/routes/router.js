@@ -78,7 +78,7 @@ router.post("/register",[
   router.post("/login",[
       body("usuario")
       .trim()
-      .notEmpty().withMessage("Comoletar este campo"),
+      .notEmpty().withMessage("Completar este campo"),
       body("password")
       .trim()
       .notEmpty().withMessage("Completar este campo")
@@ -95,13 +95,13 @@ router.post("/register",[
         }
         const miPassword=await bcrypt.compare(password,username.password);
         if(!miPassword){
-          return res.status(400).json({error:"INVALID_PASSWORD",message:"contraseña o usuario incorrecto",miError:username.password})
+          return res.status(400).json({error:"INVALID_PASSWORD",message:"contraseña o usuario incorrecto"})
         }
-        const token=jwt.sign({usuario:username.usuario},"secreto",{expiresIn:"15m"});
+        const token=jwt.sign({usuario:username.usuario},"secreto",{expiresIn:"40s"});
         const refreshToken=jwt.sign({usuario:username.usuario},"refresco",{expiresIn:"7d"});
         username.refreshToken=refreshToken;
         await username.save();
-        res.cookie("token",token,{
+{/*res.cookie("token",token,{
           httpOnly:true,
           secure:false,
           sameSite:"strict",
@@ -112,7 +112,7 @@ router.post("/register",[
           secure:false,
           sameSite:"strict",
           maxAge:7*24*60*60*1000
-        })
+        })*/}
         return res.status(200).json({message:"Login exitoso",token,refreshToken,message:username.usuario})
       }catch(error){
         res.status(500).json({error:error.message,message:"Error en el servidor"})
@@ -122,22 +122,26 @@ router.post("/register",[
     const autenticationToken=(req,res,next)=>{
       const autHeader=req.headers["authorization"];
       const token=autHeader && autHeader.split(" ")[1];
-      const accessToken=req.cookies.token;
-      if(!accessToken){
+      //const accessToken=req.cookies.token;
+      if(!token){
         return res.status(400).json({message:"El token no existe"})
       }
-      jwt.verify(accessToken,"secreto",(err,user)=>{
+      jwt.verify(token,"secreto",(err,user)=>{
         if(err){
+          if(err.name==="TokenExpiredError"){
+          return res.status(403).json({error:"Token expirado"})
+        }else{
           return res.status(403).json({error:"Token invalido"})
         }
         req.user=user;
         next()
-      })
+      }})
     }
     router.post("/refreshToken",(req,res)=>{
-      const refreshToken=req.cookies.refreshToken;
+      const autHeader=req.headers["authorization"];
+      const refreshToken=autHeader && autHeader.split(" ")[1]
       if(!refreshToken){
-        res.status(400).json({message:"Bo autenticado"})
+        return res.status(400).json({message:"Bo autenticado"})
       }
       try{
         jwt.verify(refreshToken,"refresco",(err,user)=>{
@@ -145,15 +149,10 @@ router.post("/register",[
             return res.status(400).json({error:"Token invslido"})
           }
           const newAccessToken=jwt.sign({username:user.usuario},"secreto",{expiresIn:"15m"})
+          res.status(200).json({accessToken:newAccessToken,message:"token renovado exitosamente"})
         })
         
-        res.cookie("token",newAccessToken,{
-          httpOnly:true,
-          secure:false,
-          sameSite:"strict",
-          maxAge:15*60*1000
-        })
-        res.status(200).json({message:"token renovado exitosamente"})
+        
       }catch(error){
         res.status(403).json({
           error:"Token invalido o expirado"
@@ -253,7 +252,7 @@ router.post("/register",[
           nombre:user.nombre,apellido:user.apellido,telefono:user.telefono,documento:user.dni,email:user.email
         })
       })
-    router.get("/compra",autenticationToken,(req,res)=>{
+    router.get("/compras",autenticationToken,(req,res)=>{
       res.json({message:"compra exitosa"})
     })
 
