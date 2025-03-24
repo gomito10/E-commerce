@@ -95,28 +95,12 @@ router.post("/register",[
         }
         const miPassword=await bcrypt.compare(password,username.password);
         if(!miPassword){
-<<<<<<< HEAD
           return res.status(400).json({error:"INVALID_PASSWORD",message:"contraseña o usuario incorrecto"})
-=======
-          return res.status(400).json({error:"INVALID_PASSWORD",message:"contraseña o usuario incorrecto",miError:password})
->>>>>>> 3dde271f8c48691be7ac3abdf38a9a2c887aa755
         }
-        const token=jwt.sign({usuario:username.usuario},"secreto",{expiresIn:"40s"});
+        const token=jwt.sign({usuario:username.usuario},"secreto",{expiresIn:"15m"});
         const refreshToken=jwt.sign({usuario:username.usuario},"refresco",{expiresIn:"7d"});
         username.refreshToken=refreshToken;
         await username.save();
-{/*res.cookie("token",token,{
-          httpOnly:true,
-          secure:false,
-          sameSite:"strict",
-          maxAge:15*60*1000
-        })
-        res.cookie("refreshToken",refreshToken,{
-          httpOnly:true,
-          secure:false,
-          sameSite:"strict",
-          maxAge:7*24*60*60*1000
-        })*/}
         return res.status(200).json({message:"Login exitoso",token,refreshToken,message:username.usuario})
       }catch(error){
         res.status(500).json({error:error.message,message:"Error en el servidor"})
@@ -124,34 +108,22 @@ router.post("/register",[
     }
     )
     const autenticationToken=(req,res,next)=>{
-<<<<<<< HEAD
       const autHeader=req.headers["authorization"];
       const token=autHeader && autHeader.split(" ")[1];
-      //const accessToken=req.cookies.token;
       if(!token){
-        return res.status(400).json({message:"El token no existe"})
-=======
-      //const autHeader=req.headers["authorization"];
-      //const token=autHeader && autHeader.split(" ")[1];
-      const accessToken=req.cookies.token;
-      if(!accessToken){
-        return res.status(400).json({error:"NO_TOKEN",message:"El token no existe"})
->>>>>>> 3dde271f8c48691be7ac3abdf38a9a2c887aa755
+        return res.status(400).json({error:"INVALID_TOKEN",message:"El token no existe"})
       }
       jwt.verify(token,"secreto",(err,user)=>{
         if(err){
-<<<<<<< HEAD
           if(err.name==="TokenExpiredError"){
-          return res.status(403).json({error:"Token expirado"})
+            return res.status(401).json({error:"Token expirado"})
         }else{
           return res.status(403).json({error:"Token invalido"})
-=======
-          return res.status(403).json({error:"INVALID_TOKEN",message:"Token invalido"})
->>>>>>> 3dde271f8c48691be7ac3abdf38a9a2c887aa755
         }
         req.user=user;
-        next()
+      
       }})
+      next()
     }
     router.post("/refreshToken",(req,res)=>{
       const autHeader=req.headers["authorization"];
@@ -255,18 +227,8 @@ router.post("/register",[
           res.status(500).json({error:"Error al actualizar la contraseña",message:error.message})
         }
       })
-      router.get("/datos",autenticationToken,async(req,res)=>{
-        const user=await User.findOne({
-          usuario:"RiverPlate"
-        });
-
-
-        if(!user){
-          return res.status(400).json({error:"El usuario no existe"})
-        };
-        res.status(200).json({usuario:user.usuario,resetToken:user.resetToken,resetTokenExpiration:user.resetTokenExpiration,
-          nombre:user.nombre,apellido:user.apellido,telefono:user.telefono,documento:user.dni,email:user.email
-        })
+      router.get("/datos",autenticationToken,(req,res)=>{
+        res.json({message:"Datos correctos",nombre:req.user.usuario})
       })
     router.get("/compras",autenticationToken,(req,res)=>{
       res.json({message:"compra exitosa"})

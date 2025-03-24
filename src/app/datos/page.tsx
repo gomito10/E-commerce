@@ -44,7 +44,7 @@ import {useForm} from "react-hook-form"
            <Link href="#" className="my-5">
              <Typography variant="body2" color="primary">No conozco mi código postal</Typography>
            </Link>
-           <Button variant="contained" color="secondary" fullWidth size="large">Guardar direccio</Button>
+           <Button variant="contained" color="secondary" fullWidth size="large">Guardar dirección</Button>
            </form>
          </Box>
        </Container>
