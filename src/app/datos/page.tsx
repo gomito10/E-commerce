@@ -7,7 +7,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import Link from "next/link"
-import {useRef,forwardRef,useState,useEffect} from "react";
+import {useRef,forwardRef,useState,useEffect,useContext} from "react";
+import {crearContexto} from '../crearContexto'
 import {useForm} from "react-hook-form"
  function NewDirection(){
    const{
@@ -17,10 +18,10 @@ import {useForm} from "react-hook-form"
    return(
        <Container id="direction">
          <Box>
-         <Typography variant="body1" color="initial" className="font-extrabold">Añadir dirección</Typography>
+         <Typography variant="body1" color="initial" sx={{fontWeight:"bold",mt:1}}>Añadir dirección</Typography>
            <form>
             <FormControl fullWidth>
-             <InputLabel className="font-bold my-3">País</InputLabel>
+             <InputLabel sx={{fontWeight:"bold"}}>País</InputLabel>
             <NativeSelect
             value="Argentina"
             id="pais"
@@ -39,12 +40,39 @@ import {useForm} from "react-hook-form"
               <option value="Argentina">Argentina</option>
             </NativeSelect>
           </FormControl>
-           <InputLabel className="font-bold mt-5">Código postal</InputLabel>
-           <TextField {...register("postal")} variant="outlined" color="primary" fullWidth/>
+           <InputLabel color="success" variant="outlined">Código postal</InputLabel>
+           <TextField {...register("postal")} variant="outlined" color="primary"/>
            <Link href="#" className="my-5">
              <Typography variant="body2" color="primary">No conozco mi código postal</Typography>
            </Link>
+           <InputLabel htmlFor="calle" sx={{fontWeight:"bold",mt:1}}>Calle</InputLabel>
+           <TextField variant="outlined" color="primary" fullWidth id="calle"/>
+           <InputLabel htmlFor="numero" sx={{fontWeight:"bold",mt:1}}>Número</InputLabel>
+           <TextField variant="outlined" color="primary" fullWidth id="numero"/>
+           <InputLabel htmlFor="informacion" sx={{fontWeight:"bold",mt:1}}>Información adicional (ej. apto.201)</InputLabel>
+           <TextField variant="outlined" color="primary" fullWidth id="informacion"/>
+           <InputLabel htmlFor="provincia" sx={{fontWeight:"bold"}}>Provincia</InputLabel>
+           <NativeSelect
+           inputProps={{
+             name:"provincia",
+             id:"provincia"
+           }}
+           >
+             <option value="Buenos Aires">Bienos Aires</option>
+             <option value="Mendoza">Mendoza</option>
+           </NativeSelect>
+           <InputLabel htmlFor="ciudad" className="font-bold">Ciudad</InputLabel>
+           <NativeSelect
+           inputProps={{
+             name:"ciudad",
+             id:"ciudad"
+           }}
+           >
+             <option value="Rafael Castillo">Rafael Castillo</option>
+             <option value="Merlo">Merlo</option>
+           </NativeSelect>
            <Button variant="contained" color="secondary" fullWidth size="large">Guardar dirección</Button>
+           <Button variant="outlined" color="secondary" fullWidth size="large">Borrar dirección</Button>
            </form>
          </Box>
        </Container>
@@ -65,7 +93,7 @@ function Direction(){
   return(
       <Container>
         <Typography variant="body1" color="initial" className="font-bold">Direcciones</Typography>
-        <Button variant="contained" color="secondary" className="my-10">Nueva dirección</Button>
+        <Button variant="contained" color="secondary" className="my-10" onClick={()=>setOpen(!open)}>Agregar dirección</Button>
         <Paper className="w-full p-10" elevation={7}>
           <Typography component="address" variant="body1" color="initial">
             Besares 1680<br/>
@@ -78,13 +106,11 @@ function Direction(){
         </Paper>
         <Dialog open={open} onClose={()=>setOpen(!open)}>
           <DialogTitle>
-            <Typography variant="body1" color="initial" className="font-bold">Añadir dirección</Typography>
+            <Typography variant="body1" className="font-bold">Añadir dirección</Typography>
           </DialogTitle>
           <DialogContent>
             <Paper elevation={7}>
-              <form>
-                
-              </form>
+              <NewDirection/>
             </Paper>
           </DialogContent>
         </Dialog>
@@ -161,18 +187,36 @@ async function handleChange(){
 const MisDatos=forwardRef((props,ref)=>{
   const[open,setOpen]=useState(false);
   const[data,setData]=useState({});
-  useEffect(()=>{
-    const fetchData=async()=>{
-      const response=await fetch("http://localhost:4000/tokens");
-      const dato=await response.json();
-      setData(dato);
-    }
-    fetchData();
-  },[])
+  const{token}=useContext(crearContexto)
+  const[nombre,setNombre]=useState("")
+  const{register,watch}=useForm()
   function handleBack(){
     document.getElementById("datos").scrollIntoView({behavior:"smooth",block:"center"})
     window.scrollTo(0,0)
   }
+  function handleSave(){
+    alert("luis")
+  }
+  
+  useEffect(()=>{
+    const fetchData=async ()=>{
+    try{
+    const response=await fetch("http://localhost:4000/datos",{
+      method:"GET",
+      headers:{
+        Authorization:`Bearer ${token}`
+      }
+    });
+    const result=await response.json();
+    setData(result)
+    }catch(error){
+      console.error("Error de usuario en datos")
+    }
+    }
+    fetchData()
+  },[])
+  
+  const usuario=watch("username")
   return(
     <Container className="py-3 shrink-0 bg-gray-100" id="/perfil" ref={ref}>
       <IconButton onClick={handleBack}>
@@ -185,7 +229,7 @@ const MisDatos=forwardRef((props,ref)=>{
             <ListItem>
               <ListItemText>
                 <Typography variant="body1" color="initial" className="font-bold">Nombre</Typography>
-                <Typography variant="body2" className="text-gray-500">{data.usuario}</Typography>
+                <Typography variant="body2" className="text-gray-500" >{data.username}</Typography>
               </ListItemText>
               </ListItem>
                           <ListItem>
@@ -209,7 +253,7 @@ const MisDatos=forwardRef((props,ref)=>{
             <ListItem>
               <ListItemText>
                 <Typography variant="body1" color="initial" className="font-bold">Teléfono</Typography>
-                <Typography variant="body2" className="text-gray-500">{data.telefono}</Typography>
+                <Typography variant="body2" className="text-gray-500">{data.tel}</Typography>
               </ListItemText>
               </ListItem>
           </List>
@@ -224,17 +268,20 @@ const MisDatos=forwardRef((props,ref)=>{
         <DialogContent>
             <form>
             <InputLabel htmlFor="nombre" className="font-bold">Nombre</InputLabel>
-            <TextField color="primary" variant="outlined" value="Luis" type="text" fullWidth id="nombre"/>
+            
+            <TextField color="primary" variant="outlined" type="text" fullWidth id="nombre" {...register("username")} defaultValue={data.username}/>
             <InputLabel htmlFor="apellido" className="font-bold mt-5">Apellido</InputLabel>
-            <TextField color="primary" variant="outlined" value="Gómez" type="text" id="apellido"/>
+            <TextField color="primary" variant="outlined" defaultValue={data.apellido} type="text" id="apellido" {...register("apellido")}/>
+            <InputLabel htmlFor="email" className="font-bold mt-5">Email</InputLabel>
+            <TextField color="primary" variant="outlined" defaultValue={data.email} type="email" id="email" {...register("email")}/>
             <InputLabel htmlFor=" dni" className="font-bold mt-5">DNI</InputLabel>
-            <TextField color="primary" variant="outlined" value="28280639" type="number" id="dni"/>
+            <TextField color="primary" variant="outlined" defaultValue={data.documento} type="number" id="dni" {...register("documento")}/>
             <InputLabel htmlFor="telefono" className="font-bold mt-5">Teléfono</InputLabel>
-            <TextField color="primary" variant="outlined" value="(11)5560-6321" type="text" id="telefono"/>
+            <TextField color="primary" variant="outlined" defaultValue={data.tel} type="text" id="telefono" {...register("telefono")}/>
             </form>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" color="secondary" fullWidth>
+          <Button variant="contained" color="secondary" fullWidth onClixk={handleSave}>
             Guardar cambios
           </Button>
         </DialogActions>
