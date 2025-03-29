@@ -3,6 +3,7 @@ require("./dataBase/connectDb.js");
 const cookieParser=require("cookie-parser")
 const authRouter=require("./routes/router.js")
 const cors=require("cors")
+const redis=require("redis")
 const app=express()
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))

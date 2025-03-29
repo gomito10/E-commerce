@@ -42,8 +42,27 @@ const userSchema=new mongoose.Schema({
     },
     refreshToken:String,
     resetToken:String,
-    resetTokenExpiration:Date
-  
+    resetTokenExpiration:Date,
+    cp:{
+      type:String,
+      trim:true
+    },
+    calle:{
+      type:String,
+      trim:true,
+    },
+    numero:{
+      type:String,
+      trim:true,
+    },
+  informacion:{
+    type:String,
+    trim:true
+  },
+  provincia:{
+    type:String
+  },
+  ciudad:String
 })
 
 userSchema.pre("save",async function(next){
