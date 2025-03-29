@@ -59,7 +59,6 @@ const Cuenta = () => {
     const data=await response.json();
     console.log("Datos protegidos",data);
     router.push("/datos")
-    alert(data.message)
   }catch(error){
     console.error("Error en la solicitud a la ruta protegida",error.message)
   }
