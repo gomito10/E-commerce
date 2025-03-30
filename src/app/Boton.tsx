@@ -4,12 +4,16 @@ import {Card,CardActionArea,CardMedia,CardContent,CardActions,Button,Grid2,Typog
 import {useContext,useEffect,useState} from 'react';
 import {crearContexto} from './crearContexto'
 function Boton({nombre,producto}){
-  const {countCart,setCountCart}=useContext(crearContexto)
+  const {countCart,setCountCart}=useContext(crearContexto);
+  const objeto={
+    count:count,
+    item:producto
+  }
   function handleStorage(){
     const addLocalStorage=localStorage.getItem(nombre)
     if(!addLocalStorage){
       localStorage.setItem(nombre,JSON.stringify
-  (producto))
+  (objeto))
   setCountCart(countCart+1)
   }
   }

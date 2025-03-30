@@ -129,7 +129,7 @@ router.post("/register",[
         }
         const sessionId=crypto.randomUUID();
         const result=await registerSession(usuarioId,sessionId);
-        const token=jwt.sign({usuario:username.usuario,nombre:username.nombre,apellido:username.apellido,email:username.email,tel:username.telefono,documento:username.dni,id:username._id},"secreto",{expiresIn:"15m"});
+        const token=jwt.sign({usuario:username.usuario,nombre:username.nombre,apellido:username.apellido,email:username.email,tel:username.telefono,documento:username.dni,id:username._id,sessionId:sessionId},"secreto",{expiresIn:"15m"});
         const refreshToken=jwt.sign({usuario:username.usuario},"refresco",{expiresIn:"7d"});
         username.refreshToken=refreshToken;
         await username.save();
@@ -397,16 +397,25 @@ router.post("/register",[
      
    })
    router.post("/logout",autenticationToken,async (req,res)=>{
+     try{
      const username= await User.findById(req.user.id)
-     if(!userId){
+     if(!username){
        return res.status(400).json({message:"El usuario no existe"})
      }
-     const autHeaders=req.headers("authorization");
-     const token=authorization && req.headers["authorization"].split(" ")
+     const autHeaders=req.headers["authorization"];
+     const token=autHeaders && autHeaders.split(" ")[1];
+     if(!token || typeof token !== "string"){
+      return res.status(400).json({message:"El token no existe"})
+     }
      const decoded=jwt.verify(token,'secreto')
      const tiempoRestante=decoded.exp-Math.floor(Date.now()/1000)
-     await client.set(`blackList:${token}`,true,{EX:tiempoRestante});
-     await client.sRem(`sessions:${usuarioId}`,sessionId);
-     res.status(200).json({message:"sesión cerrada correctamente"})
-     })
+     const usuarioId=req.user.id;
+     const sessionId=req.user.sessionId;
+     await client.set(`blackList:${token}`,"",{EX:tiempoRestante});
+     {/*await client.sRem(`sessions:${usuarioId}`,sessionId);*/}
+     res.status(200).json({message:"sesión cerrada correctamente",usuario:username.usuario})
+   }catch(error){
+     res.status(500).json({error:"Error al intentar cerrar sesión",message:error.message})
+   }
+   })
 module.exports=router;

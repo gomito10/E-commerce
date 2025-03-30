@@ -16,6 +16,7 @@ function Aagregar({onSuma,onResta,miTotal}){
   function handleSuma(){
     setCount(c=>c+1)
     onSuma()
+    
   }
   function handleResta(){
     if(count<=1){
@@ -68,15 +69,15 @@ function handleCategory(id){
   }
 }
 function handleResta(miTotal){
-  setTotal(total-miTotal)
   if(total<1){
     setTotal(0)
-  
+  }else{
+    setTotal(c=>c-miTotal)
   }
   
 }
 function handleSuma(miTotal){
-  setTotal(total+miTotal)
+  setTotal(c=>c+miTotal)
 }
 useEffect(()=>{
   if(precios.length > 0){
