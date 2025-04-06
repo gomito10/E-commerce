@@ -22,11 +22,11 @@ function Aagregar({onSuma,onResta,miTotal,miProducto}){
       return nuevoValor;
     })
 setTotales(t=>{
-      const nuevoTotal=t+miTotal;
+      const nuevoTotal=Number(t)+miTotal;
       return nuevoTotal;
     })
     const nuevoValor=count+1;
-    const nuevoTotal=totales+miTotal;
+    const nuevoTotal=(Number(totales)+miTotal).toFixed(2);
     localStorage.setItem(miProducto,JSON.stringify({"contador":nuevoValor,"total":nuevoTotal}))
   onSuma()
    // localStorage.setItem("contador",)
@@ -45,7 +45,7 @@ setTotales(t=>{
         return nuevoTotal;
       })
       const nuevoValor=count-1;
-      const nuevoTotal=totales-miTotal;
+      const nuevoTotal=(totales-miTotal).toFixed(2);
       localStorage.setItem(miProducto,JSON.stringify({"contador":nuevoValor,"total":nuevoTotal}))
       onResta()
       //setPrecioTotal(t=>t-miTotal)
@@ -53,7 +53,8 @@ setTotales(t=>{
     
   }
   useEffect(()=>{
-    localStorage.setItem(miProducto,JSON.stringify({"contador":count,"total":totales}))
+    
+    localStorage.setItem(miProducto,JSON.stringify({"contador":count,"total":Number(totales).toFixed(2)}))
     
   },[count,totales])
 
@@ -63,7 +64,7 @@ setTotales(t=>{
         <Button variant="outlined" size="small" color="secondary" onClick={()=>handleSuma()}>+</Button>
          <Typography>{JSON.parse(localStorage.getItem(miProducto))?.contador||1}</Typography>
         <Button variant="outlined" color="success" onClick={()=>handleResta()} size="small">-</Button>
-        <Typography variant="h5" className="font-extrabold">${JSON.parse(localStorage.getItem(miProducto))?.total.toFixed(2)||miTotal}</Typography>
+        <Typography variant="h5" className="font-extrabold">${JSON.parse(localStorage.getItem(miProducto))?.total||miTotal}</Typography>
         </Box>
       </>
     )
@@ -97,7 +98,7 @@ function handleCategory(id){
 function handleSuma(miTotal){
   setPrecioTotal(c=>{
     const nuevoValor=c+miTotal;
-    localStorage.setItem("pagar",JSON.stringify(nuevoValor))
+    localStorage.setItem("pagar",nuevoValor.toFixed(2))
     return nuevoValor;
   })
 }
@@ -107,7 +108,7 @@ function handleResta(miTotal){
   }else{
     setPrecioTotal(t=>{
       const nuevoValor=t-miTotal;
-      localStorage.setItem("pagar",JSON.stringify(nuevoValor));
+      localStorage.setItem("pagar",nuevoValor.toFixed(2));
       return nuevoValor;
     })
   }
@@ -157,8 +158,9 @@ useEffect(()=>{
   setPrecios(misPrecios)
 },[localStorage.length])
 useEffect(()=>{
-  localStorage.setItem("pagar",JSON.stringify(precioTotal.toFixed(2)))
+  localStorage.setItem("pagar",precioTotal.toFixed(2))
 },[precioTotal])
+
   return(
     <>
       <AppBar position="static" sx={{backgroundColor:"white"}}>
@@ -231,7 +233,7 @@ useEffect(()=>{
             <CardMedia 
             component="img"
             height="150px"
-            image={item.datos.image}
+            image={item.datos?.image}
             sx={{
               width:"50%",
               height:"50%",
@@ -241,12 +243,12 @@ useEffect(()=>{
             }}
             />
             <CardContent className="text-center">
-              <Typography variant="body2" color="initial">{item.datos.title}</Typography>
-              <Typography variant="body1" sx={{fontWeight:"bold"}}>${item.datos.price}</Typography>
-              <DeleteOutlineIcon color="primary" onClick={()=>handleDelete(item.datos.title,index,item.dagos.price)}/>
+              <Typography variant="body2" color="initial">{item.datos?.title}</Typography>
+              <Typography variant="body1" sx={{fontWeight:"bold"}}>${item.datos?.price}</Typography>
+              <DeleteOutlineIcon color="primary" onClick={()=>handleDelete(item.datos?.title,index,item.datos?.price)}/>
             </CardContent>
             <CardActions sx={{clear:"both"}}>
-              <Aagregar onResta={()=>handleResta(item.datos.price)} miTotal={item.datos.price} miProducto={item.datos.title} onSuma={()=>handleSuma(item.datos.price)}/>
+              <Aagregar onResta={()=>handleResta(item.datos?.price)} miTotal={item.datos?.price} miProducto={item.datos?.title} onSuma={()=>handleSuma(item.datos.price)}/>
             </CardActions>
             <Divider/>
           </Card>
