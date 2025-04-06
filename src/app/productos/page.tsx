@@ -6,12 +6,14 @@ import { useEffect, useState } from 'react';
 
 const Productos= ({y})=>{
   const [data,setData]=useState([])
+  const[count,setCount]=useState(0);
   useEffect(()=>{
       fetch(`https://fakestoreapi.com/${y}`)
       .then(response=>response.json())
       .then(data=>setData(data))
       .catch(error=>console.error("error al obtener los datos",error))
   },[])
+  
   return(
     <>
     <Container>
@@ -43,7 +45,7 @@ const Productos= ({y})=>{
               </CardContent>
               </Link>
               <CardActions>
-                <Boton nombre={prod.title} producto={prod}/>
+                <Boton nombre={`item-${prod.title}`} producto={prod} precio={prod.price}/>
               </CardActions>
             </Card>
           </Grid2>

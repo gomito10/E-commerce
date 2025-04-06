@@ -1,5 +1,6 @@
-
+"use client";
 //import type { Metadata } from "next";
+import { useEffect, useState } from "react";
 import {
     Button,
     List,
@@ -48,20 +49,23 @@ import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 const names = ["luis", "maru", "mili", "leon", "cielo"];
-
-  async function LoadData(){
-    const response=await fetch("http://localhost:4000")
-    const data=response.json()
-    return data
-  }
-async function Blog() {
-  const fetchFata=await LoadData()
+function Blog() {
+  const[count,setCount]=useState(0);
+  //const producto=JSON.parse(localStorage.getItem(localStorage.key(1));
+  //producto["contador"]=count
+   // localStorage.setItem(localStorage.key(1),producto)
+    
     return (
         <>
             <Container>
-              <Typography>{fetchFata.message}</Typography>
-            </Container>
+              <h1>Largo:{localStorage.length}</h1>
             
+                <Button variant="contained" color="info">
+                    +
+                </Button>
+                <Button variant="contained" color="warning">-
+                </Button>
+            </Container>
         </>
     );
 }

@@ -10,33 +10,60 @@ import {useRouter} from 'next/navigation';
 import {crearContexto} from './crearContexto';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import CloseIcon from '@mui/icons-material/Close';
-function Aagregar({onSuma,onResta,miTotal}){
-  const[count,setCount]=useState(1)
-  const[total,setTotal]=useState(miTotal)
+function Aagregar({onSuma,onResta,miTotal,miProducto}){
+  const{precioTotal,setPrecioTotal}=useContext(crearContexto);
+  const[count,setCount]=useState(JSON.parse(localStorage.getItem(miProducto))?.contador||1)
+  const[totales,setTotales]=useState(JSON.parse(localStorage.getItem(miProducto))?.total||miTotal)
+  const array=[];
+  //const{precioTotal,setPrecioTotal}=useContext(crearContexto);
   function handleSuma(){
-    setCount(c=>c+1)
-    onSuma()
-    
+    setCount(c=>{
+      const nuevoValor=c+1;
+      return nuevoValor;
+    })
+setTotales(t=>{
+      const nuevoTotal=t+miTotal;
+      return nuevoTotal;
+    })
+    const nuevoValor=count+1;
+    const nuevoTotal=totales+miTotal;
+    localStorage.setItem(miProducto,JSON.stringify({"contador":nuevoValor,"total":nuevoTotal}))
+  onSuma()
+   // localStorage.setItem("contador",)
+    //setPrecioTotal(t=>t+miTotal)
   }
   function handleResta(){
     if(count<=1){
       setCount(1)
     }else{
-      setCount(count-1)
+      setCount(c=>{
+        const nuevoValor=c-1;
+        return nuevoValor
+      })
+      setTotales(t=>{
+        const nuevoTotal=t-miTotal;
+        return nuevoTotal;
+      })
+      const nuevoValor=count-1;
+      const nuevoTotal=totales-miTotal;
+      localStorage.setItem(miProducto,JSON.stringify({"contador":nuevoValor,"total":nuevoTotal}))
       onResta()
+      //setPrecioTotal(t=>t-miTotal)
     }
     
   }
   useEffect(()=>{
-    setTotal(miTotal*count)
-  },[count,miTotal])
+    localStorage.setItem(miProducto,JSON.stringify({"contador":count,"total":totales}))
+    
+  },[count,totales])
+
   return(
       <>
         <Box className="flex gap-2">
         <Button variant="outlined" size="small" color="secondary" onClick={()=>handleSuma()}>+</Button>
-         <Typography>{count}</Typography>
+         <Typography>{JSON.parse(localStorage.getItem(miProducto))?.contador||1}</Typography>
         <Button variant="outlined" color="success" onClick={()=>handleResta()} size="small">-</Button>
-        <Typography variant="h5" className="font-extrabold">${total && total.toFixed(2)}</Typography>
+        <Typography variant="h5" className="font-extrabold">${JSON.parse(localStorage.getItem(miProducto))?.total.toFixed(2)||miTotal}</Typography>
         </Box>
       </>
     )
@@ -44,9 +71,8 @@ function Aagregar({onSuma,onResta,miTotal}){
 function Appbar(){
   const[search,setSearch]=useState("");
   const[cart,setCart]=useState(0);
-  const{countCart,setCountCart}=useContext(crearContexto)
+  const{countCart,setCountCart,precioTotal,setPrecioTotal}=useContext(crearContexto)
   const[itemId,setItemId]=useState([])
-  const[precio,setPrecio]=useState(null);
   const[open,setOpen]=useState(false);
   const router=useRouter();
   const categorias=["electronics","jewelery","men's clothing","women's clothing","Todos los productos"];
@@ -68,46 +94,46 @@ function handleCategory(id){
     router.push("/")
   }
 }
+function handleSuma(miTotal){
+  setPrecioTotal(c=>{
+    const nuevoValor=c+miTotal;
+    localStorage.setItem("pagar",JSON.stringify(nuevoValor))
+    return nuevoValor;
+  })
+}
 function handleResta(miTotal){
-  if(total<1){
-    setTotal(0)
+  if(precioTotal<1){
+    setPrecioTotal(0)
   }else{
-    setTotal(c=>c-miTotal)
+    setPrecioTotal(t=>{
+      const nuevoValor=t-miTotal;
+      localStorage.setItem("pagar",JSON.stringify(nuevoValor));
+      return nuevoValor;
+    })
   }
   
 }
-function handleSuma(miTotal){
-  setTotal(c=>c+miTotal)
-}
-useEffect(()=>{
+{/*useEffect(()=>{
   if(precios.length > 0){
     const suma=precios.filter(item=>typeof item === 'number');
   setTotal(suma.reduce((a,b)=>a+b,0))
   }else{
     setTotal(0)
   }
-},[precios])
+},[precios])*/}
 function handleCart(){
   localStorage.clear()
   setShow(!show)
   setCountCart(0)
+  setPrecioTotal(0)
 }
 function handleDelete(titulo,indice,valor){
   setItemId(itemId.filter((products,index)=>indice!==index));
-  localStorage.removeItem(titulo)
-  setTotal(t=>t-valor)
-  setCountCart(countCart-1)
+  localStorage.removeItem(`item-${titulo}`)
+  setPrecioTotal(t=>t-valor)
+  setCountCart(c=>c-1)
 }
-useEffect(()=>{
-  for(let i=0; i<localStorage.length;i++){
-    const items=JSON.parse(localStorage.getItem(localStorage.key(i)))
-    array.push(items)
-    misPrecios.push(items.price)
-    
-  }
-  setItemId(array)
-  setPrecios(misPrecios)
-},[countCart])
+
 function handleSearch(e){
   setSearch(e.target.value)
 }
@@ -117,6 +143,22 @@ useEffect(()=>{
     router.push(`/categorias/${filtrar}`)
   }
 },[search])
+useEffect(()=>{
+  for(let i=0;i<localStorage.length;i++){
+    const items=localStorage.getItem(localStorage.key(i))
+    if(localStorage.key(i).startsWith("item")){
+      array.push(JSON.parse(items));
+      misPrecios.push(items.price);
+  }else{
+    continue;
+  }
+  }
+  setItemId(array)
+  setPrecios(misPrecios)
+},[localStorage.length])
+useEffect(()=>{
+  localStorage.setItem("pagar",JSON.stringify(precioTotal.toFixed(2)))
+},[precioTotal])
   return(
     <>
       <AppBar position="static" sx={{backgroundColor:"white"}}>
@@ -131,7 +173,7 @@ useEffect(()=>{
           </IconButton>
           <Typography variant="body1" color="initial">Mi Cuenta</Typography>
           <IconButton>
-            <Badge badgeContent={precios.length} onClick={handleShow}>
+            <Badge badgeContent={localStorage.getItem("carrito")} onClick={handleShow}>
             <ShoppingCartOutlinedIcon/>
             </Badge>
           </IconButton>
@@ -189,7 +231,7 @@ useEffect(()=>{
             <CardMedia 
             component="img"
             height="150px"
-            image={item.image}
+            image={item.datos.image}
             sx={{
               width:"50%",
               height:"50%",
@@ -199,18 +241,18 @@ useEffect(()=>{
             }}
             />
             <CardContent className="text-center">
-              <Typography variant="body2" color="initial">{item.title}</Typography>
-              <Typography variant="body1" sx={{fontWeight:"bold"}}>${item.price}</Typography>
-              <DeleteOutlineIcon color="primary" onClick={()=>handleDelete(item.title,index,item.price)}/>
+              <Typography variant="body2" color="initial">{item.datos.title}</Typography>
+              <Typography variant="body1" sx={{fontWeight:"bold"}}>${item.datos.price}</Typography>
+              <DeleteOutlineIcon color="primary" onClick={()=>handleDelete(item.datos.title,index,item.dagos.price)}/>
             </CardContent>
             <CardActions sx={{clear:"both"}}>
-              <Aagregar onResta={()=>handleResta(item.price)} onSuma={()=>handleSuma(item.price)} miTotal={item.price}/>
+              <Aagregar onResta={()=>handleResta(item.datos.price)} miTotal={item.datos.price} miProducto={item.datos.title} onSuma={()=>handleSuma(item.datos.price)}/>
             </CardActions>
             <Divider/>
           </Card>
         ))):<h1>No hay productos selecciionados</h1>
         }
-        <Typography variant="h5" className="text-white bg-violet-700 w-full">Total: {total < 1 ? 0 : total.toFixed(2)}</Typography>
+        <Typography variant="h5" className="text-white bg-violet-700 w-full">Total: {JSON.parse(localStorage.getItem("pagar"))||0}</Typography>
         </Box>
       </Drawer>
 
