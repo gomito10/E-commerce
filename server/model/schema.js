@@ -3,31 +3,27 @@ const bcrypt=require("bcryptjs")
 const userSchema=new mongoose.Schema({
   nombre:{
     type:String,
-    required:true,
     trim:true,
   },
   apellido:{
     type:String,
-    required:true,
     trim:true
   },
   email:{
     type:String,
-    required:true,
-    unique:true,
-    match:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    match:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+    trim:true,
+    uniqie:true
   },
   dni:{
     type:Number,
-    required:true,
     trim:true,
     unique:true
   },
   telefono:{
     type:String,
-    unique:true,
     match:/^(?:\+?(\d{1,3}))?[-. (]*(\d{1,4})[-. )]*(\d{1,4})[-. ]*(\d{1,9})(?: *x(\d+))?$/,
-    trim:true
+    trim:true,
   },
     usuario:{
       type:String,

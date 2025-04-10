@@ -272,6 +272,29 @@ router.post("/register",[
           res.status(500).json({error:"Error al actualizar la contraseña",message:error.message})
         }
       })
+      router.post("/recoveryUser",async(req,res)=>{
+        const {email}=req.body;
+        const username=await User.findOne({email});
+        if(!username){
+          res.status(400).json({message:"El usuario no existe"})
+        };
+        const transporter=nodemailer.createTransport({
+            service:'gmail',
+            auth:{
+              user:'gomito724@gmail.com',
+              pass:'rkcfiqrssmdzxwoy'
+            },
+            secure:true
+          });
+          const mailOptions={
+            from:'gomito724@gmail.com',
+            to:email,
+            subject:'Recuperación de usuario',
+            text:`Su usuario es :${username.usuario}`
+          };
+          await transporter.sendMail(mailOptions);
+          res.json({message:"Mail enviado con exito"})
+      })
       router.get("/datos",autenticationToken,(req,res)=>{
         const autHeader=req.headers["authorization"];
         const token=autHeader && autHeader.split(" ")[1]
@@ -289,7 +312,7 @@ router.post("/register",[
     router.get("/compras",autenticationToken,(req,res)=>{
       res.json({message:"compra exitosa"})
     })
-   router.patch("/patch",autenticationToken,[
+   router.patch("/datos",autenticationToken,[
      body("nombre")
      .trim()
      .notEmpty().withMessage("Completar este campo")
@@ -305,9 +328,9 @@ router.post("/register",[
      .notEmpty().withMessage("Completar este campo")
      .isEmail().withMessage("Formato no valido"),
      body("telefono")
-     .trim()
-     .notEmpty().withMessage("Completar este campo")
-     .matches(/^[0-9+\-\s]+$/).withMessage("El telefono debe contener solo numeros,espacios,guiones y el simbolo '+'"),
+     .trim(),
+     //.notEmpty().withMessage("Completar este campo")
+     //.matches(/^[0-9+]+$/).withMessage("El telefono debe contener solo numeros,espacios,guiones y el simbolo '+'"),
      body("dni")
      .trim()
      .notEmpty().withMessage("Completar este campo")
@@ -319,21 +342,34 @@ router.post("/register",[
        }
      try{
      const {nombre,apellido,email,telefono,dni}=req.body;
-     const datos=req.body
-     const user=await User.findByIdAndUpdate(req.user.id,
-     {$set:datos},
-     {new:true}
-     )
-     if(!user){
+     const username=await User.findById(req.user.id);
+     if(!username){
        return res.status(400).json({message:"El usuario no existe"})
      }
-     
-     res.json({message:"El usuario ha sido actualizado correctamente",user:user})
-     }catch(error){
-       if(error.code===1001){
-         res.status(500).json({error:"El ususrio ya existe"})
+     const objeto={}
+      for (let key in req.body){
+        if(req.body[key]===""){
+          continue;
+        }else{
+          objeto[key]=req.body[key]
+        }
+      }
+       const user=await User.findByIdAndUpdate(
+           req.user.id,
+           {$set:objeto},
+           {new:true}
+         );
+         if(!user){
+           res.status(400).json({error:"El usuario no existe"})
+         }
+         
+      res.json({message:"El usuario ha sido actualizado correctamente",user:user})
+         
+  }catch(error){
+       if(error.code===11000){
+         return res.status(500).json({error:"El ususrio ya existe",message:error.message})
        }
-       res.status(400).json({error:"Error en el servidor al actualizar datos en mi ruta /patch"
+       res.status(400).json({error:"Error en el servidor al actualizar datos en mi ruta /patch",message:error.message
      })
    }
    })
@@ -396,6 +432,67 @@ router.post("/register",[
      }
      
    })
+   router.patch("/change-password",autenticationToken,[
+     body("email")
+     .trim()
+     .notEmpty().withMessage("Completar este campo")
+     ],async(req,res)=>{
+       const errors=await validationResult(req);
+       if(!errors.notEmpty()){
+         return res.status(400).json({errors:errors.array()})
+       }
+       try{
+         const{currentPassword,newPassword}=req.body;
+         const username=await User.findById(req.user.id);
+         if(!username){
+           res.status(400).json({message:"El usuario no existe"});
+         }
+         const isValidPassword=await bcrypt.compare(currentPassword,username.password);
+         if(isValidPassword){
+           res.json({message:"La contraseña no puede ser la misma q la actual"})
+         }
+         const hashNewPassword=await bcrypt.hash(newPassword,10);
+         await User.findByIdAndUpdate(req.user.id,{password:hashNewPassword});
+         res.json({message:"La contraseña ha sido modificada correctamente"})
+       }catch(error){
+         res.status(500).json({error:"Error al intentar modificar la contraseña"});
+       }
+     });
+     router.patch("/change-username",[
+       body("newUsername")
+       .trim()
+       .notEmpty().withMessage("Completar este campo")
+       .matches(/^[a-zA-Z0-9]+$/).withMessage("El usuario debe tener solo letras y numeros")
+       .isLength({min:8,max:20}).withMessage("El usuario debe tener entre 8 y 20 caracteres")
+       ],autenticationToken,async(req,res)=>{
+         const errors=validationResult(req);
+         if(!errors.isEmpty()){
+          return res.status(400).json({errors:errors.array()})
+         }
+         try{
+           const{newUsername}=req.body;
+           const user=await User.findById(req.user.id)
+           if(!user){
+             return res.status(400).json({message:"El usuario no existe"})
+           };
+           if(newUsername===user.usuario){
+             return res.status(400).json({
+               message:"El nuevo usuario debe ser diferente al actúal"
+             })
+           }
+           const existUser=await User.findOne({usuario:newUsername});
+           if(existUser){
+             return res.status(400).json({message:"El usuario ya existe",user:newUsername})
+           }
+           
+           const changeUser=await User.findByIdAndUpdate(req.user.id,{
+             usuario:newUsername
+           },{new:true});
+           return res.json({message:"Nombre de usuario modificado correctamente",user:changeUser})
+         }catch(error){
+           res.status(500).json({error:"Error en el servidor al modificar el usuario",message:error.message})
+         }
+       })
    router.post("/logout",autenticationToken,async (req,res)=>{
      try{
      const username= await User.findById(req.user.id)

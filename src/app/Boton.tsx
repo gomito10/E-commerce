@@ -33,7 +33,7 @@ useEffect(()=>{
 },[])
   return(
    <>
-     <Button variant="contained" color="error" fullWidth onClick={handleStorage}>
+     <Button variant="contained" color="error" fullWidth onClick={handleStorage} sx={{margin:"10px 0"}} size="large">
        Agregar
      </Button>
       </>

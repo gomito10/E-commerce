@@ -189,14 +189,29 @@ const MisDatos=forwardRef((props,ref)=>{
   const[data,setData]=useState({});
   const{token}=useContext(crearContexto)
   const[nombre,setNombre]=useState("")
-  const{register,watch}=useForm()
+  const{register,watch,handleSubmit}=useForm()
   function handleBack(){
     document.getElementById("datos").scrollIntoView({behavior:"smooth",block:"center"})
     window.scrollTo(0,0)
   }
-  function handleSave(){
-    alert("luis")
-  }
+ async function onSubmit(data){
+      const response=await fetch("http://localhost:4000/datos",{
+        method:"PATCH",
+        headers:{
+          "Content-Type":"application/json",
+          Authorization:`Bearer ${token}`
+        },
+        body:JSON.stringify(data)
+      })
+      
+      const result=await response.json()
+      if(!response.ok){
+        alert("Datos actualizados incorrectamente");
+        return;
+      }
+      alert("Los datos fueron actualiza correctamente")
+    }
+  
   
   useEffect(()=>{
     const fetchData=async ()=>{
@@ -266,7 +281,7 @@ const MisDatos=forwardRef((props,ref)=>{
         </IconButton>
         </DialogTitle>
         <DialogContent>
-            <form>
+            <form onSubmit={handleSubmit(onSubmit)}>
             <InputLabel htmlFor="nombre" className="font-bold">Nombre</InputLabel>
             
             <TextField color="primary" variant="outlined" type="text" fullWidth id="nombre" {...register("username")} defaultValue={data.username}/>
@@ -278,13 +293,11 @@ const MisDatos=forwardRef((props,ref)=>{
             <TextField color="primary" variant="outlined" defaultValue={data.documento} type="number" id="dni" {...register("documento")}/>
             <InputLabel htmlFor="telefono" className="font-bold mt-5">Teléfono</InputLabel>
             <TextField color="primary" variant="outlined" defaultValue={data.tel} type="text" id="telefono" {...register("telefono")}/>
-            </form>
-        </DialogContent>
-        <DialogActions>
-          <Button variant="contained" color="secondary" fullWidth onClixk={handleSave}>
+            <Button variant="contained" color="secondary" fullWidth type="submit">
             Guardar cambios
           </Button>
-        </DialogActions>
+            </form>
+        </DialogContent>
       </Dialog>
       </Container>
   )

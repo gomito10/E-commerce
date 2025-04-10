@@ -21,14 +21,14 @@ const Productos= ({y})=>{
      {
        data && data.map((prod,index)=>(
           <Grid2 size={{xs:6,sm:3}} key={index}>
-            <Card sx={{width:"100%",height:"300px"}}
+            <Card sx={{width:"100%",height:"350px"}}
             elevation={12}
             >
             <Link href={`../description/${prod.id}`}>
               <CardMedia
               component="img"
               image={prod.image}
-              height="150px"
+              height="130px"
               alt={prod.title}
               sx={{
                 width:"50%",

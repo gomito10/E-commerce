@@ -64,7 +64,7 @@ function Compra(){
   }
   return(
      <>
-       <Button variant="contained" color="error" fullWidth onClick={handleClick} className="my-2">Comprar</Button>
+       <Button variant="contained" color="error" fullWidth onClick={handleClick} size="large">Comprar</Button>
      </>
     )
 }
