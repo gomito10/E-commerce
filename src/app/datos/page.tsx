@@ -190,31 +190,8 @@ const MisDatos=forwardRef((props,ref)=>{
   const{token}=useContext(crearContexto)
   const[nombre,setNombre]=useState("")
   const{register,watch,handleSubmit}=useForm()
-  function handleBack(){
-    document.getElementById("datos").scrollIntoView({behavior:"smooth",block:"center"})
-    window.scrollTo(0,0)
-  }
- async function onSubmit(data){
-      const response=await fetch("http://localhost:4000/datos",{
-        method:"PATCH",
-        headers:{
-          "Content-Type":"application/json",
-          Authorization:`Bearer ${token}`
-        },
-        body:JSON.stringify(data)
-      })
-      
-      const result=await response.json()
-      if(!response.ok){
-        alert("Datos actualizados incorrectamente");
-        return;
-      }
-      alert("Los datos fueron actualiza correctamente")
-    }
   
-  
-  useEffect(()=>{
-    const fetchData=async ()=>{
+  const fetchData=async ()=>{
     try{
     const response=await fetch("http://localhost:4000/datos",{
       method:"GET",
@@ -228,8 +205,30 @@ const MisDatos=forwardRef((props,ref)=>{
       console.error("Error de usuario en datos")
     }
     }
+  function handleBack(){
+    document.getElementById("datos").scrollIntoView({behavior:"smooth",block:"center"})
+    window.scrollTo(0,0)
+  }
+ async function onSubmit(data){
+    const response=await fetch("http://localhost:4000/datos",{
+      method:"PATCH",
+      headers:{
+        "Content-Type":"application/json",
+        Authorization:`Bearer ${token}`
+      },
+      body:JSON.stringify(data)
+    })
+   if(!response.ok){
+      alert("datos incorrectos")
+    }
+    const result=await responsejson();
+    console.log(result);
+  }
+  
+  useEffect(()=>{
+    
     fetchData()
-  },[])
+  },[data])
   
   const usuario=watch("username")
   return(
@@ -242,16 +241,16 @@ const MisDatos=forwardRef((props,ref)=>{
       <Box className="bg-white py-3">
           <List>
             <ListItem>
-              <ListItemText>
-                <Typography variant="body1" color="initial" className="font-bold">Nombre</Typography>
-                <Typography variant="body2" className="text-gray-500" >{data.username}</Typography>
+              <ListItemText>5
+                <Typography variant="body1" color="initia65l" className="font-bold">Nombre</Typography>
+                <Typography variant="body2" className="text-gray-500" >{datausername}</Typography>
               </ListItemText>
               </ListItem>
                           <ListItem>
-              <ListItemText>
-                <Typography variant="body1" color="initial" className="font-bold">Apellido</Typography>
-                <Typography variant="body2" className="text-gray-500">{data.apellido}</Typography>
-              </ListItemText>
+              <ListItemText>555
+                <Typography vari555ant="body1" color="initial6" className="font-bold">65Apellido</555Ty6pography65666554>
+                <Typo5graphy variant="body2" className="text-gray-500">{data.apellido}</Typography>
+       676g5       </ListItemText>
               </ListItem>
             <ListItem>
               <ListItemText>
@@ -284,13 +283,13 @@ const MisDatos=forwardRef((props,ref)=>{
             <form onSubmit={handleSubmit(onSubmit)}>
             <InputLabel htmlFor="nombre" className="font-bold">Nombre</InputLabel>
             
-            <TextField color="primary" variant="outlined" type="text" fullWidth id="nombre" {...register("username")} defaultValue={data.username}/>
+            <TextField color="primary" variant="outlined" type="text" fullWidth id="nombre" {...register("nombre")} defaultValue={data.username}/>
             <InputLabel htmlFor="apellido" className="font-bold mt-5">Apellido</InputLabel>
             <TextField color="primary" variant="outlined" defaultValue={data.apellido} type="text" id="apellido" {...register("apellido")}/>
             <InputLabel htmlFor="email" className="font-bold mt-5">Email</InputLabel>
             <TextField color="primary" variant="outlined" defaultValue={data.email} type="email" id="email" {...register("email")}/>
             <InputLabel htmlFor=" dni" className="font-bold mt-5">DNI</InputLabel>
-            <TextField color="primary" variant="outlined" defaultValue={data.documento} type="number" id="dni" {...register("documento")}/>
+            <TextField color="primary" variant="outlined" defaultValue={data.documento} type="number" id="dni" {...register("dni")}/>
             <InputLabel htmlFor="telefono" className="font-bold mt-5">Teléfono</InputLabel>
             <TextField color="primary" variant="outlined" defaultValue={data.tel} type="text" id="telefono" {...register("telefono")}/>
             <Button variant="contained" color="secondary" fullWidth type="submit">
@@ -305,7 +304,7 @@ const MisDatos=forwardRef((props,ref)=>{
 const Datos = () => {
   const[open,setOpen]=useState(false)
   const miref=useRef()
-  const opciones=["Datos personales","Autenticación","Direcciones","Salir"]
+  const opciones=["Datos personales","Autenticación","Direcciones","Saklir"]
   function handleRouter(opcion){
     if(opcion==3){
       setOpen(!open)

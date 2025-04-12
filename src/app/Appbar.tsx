@@ -22,11 +22,11 @@ function Aagregar({onSuma,onResta,miTotal,miProducto}){
       return nuevoValor;
     })
 setTotales(t=>{
-      const nuevoTotal=Number(t)+miTotal;
+      const nuevoTotal=t+miTotal;
       return nuevoTotal;
     })
     const nuevoValor=count+1;
-    const nuevoTotal=(Number(totales)+miTotal).toFixed(2);
+    const nuevoTotal=totales+miTotal;
     localStorage.setItem(miProducto,JSON.stringify({"contador":nuevoValor,"total":nuevoTotal}))
   onSuma()
    // localStorage.setItem("contador",)
@@ -45,7 +45,7 @@ setTotales(t=>{
         return nuevoTotal;
       })
       const nuevoValor=count-1;
-      const nuevoTotal=(totales-miTotal).toFixed(2);
+      const nuevoTotal=totales-miTotal;
       localStorage.setItem(miProducto,JSON.stringify({"contador":nuevoValor,"total":nuevoTotal}))
       onResta()
       //setPrecioTotal(t=>t-miTotal)
@@ -53,8 +53,7 @@ setTotales(t=>{
     
   }
   useEffect(()=>{
-    
-    localStorage.setItem(miProducto,JSON.stringify({"contador":count,"total":Number(totales).toFixed(2)}))
+    localStorage.setItem(miProducto,JSON.stringify({"contador":count,"total":totales}))
     
   },[count,totales])
 
@@ -98,7 +97,7 @@ function handleCategory(id){
 function handleSuma(miTotal){
   setPrecioTotal(c=>{
     const nuevoValor=c+miTotal;
-    localStorage.setItem("pagar",nuevoValor.toFixed(2))
+    localStorage.setItem("pagar",JSON.stringify(nuevoValor))
     return nuevoValor;
   })
 }
@@ -108,7 +107,7 @@ function handleResta(miTotal){
   }else{
     setPrecioTotal(t=>{
       const nuevoValor=t-miTotal;
-      localStorage.setItem("pagar",nuevoValor.toFixed(2));
+      localStorage.setItem("pagar",JSON.stringify(nuevoValor));
       return nuevoValor;
     })
   }
@@ -130,9 +129,11 @@ function handleCart(){
 }
 function handleDelete(titulo,indice,valor){
   setItemId(itemId.filter((products,index)=>indice!==index));
+  const borrar=JSON.parse(localStorage.getItem(titulo))
   localStorage.removeItem(`item-${titulo}`)
-  setPrecioTotal(t=>t-valor)
+  setPrecioTotal(t=>t-borrar.total)
   setCountCart(c=>c-1)
+  localStorage.setItem(titulo,JSON.stringify({"contador":0}));
 }
 
 function handleSearch(e){
@@ -158,9 +159,8 @@ useEffect(()=>{
   setPrecios(misPrecios)
 },[localStorage.length])
 useEffect(()=>{
-  localStorage.setItem("pagar",precioTotal.toFixed(2))
+  localStorage.setItem("pagar",JSON.stringify(precioTotal))
 },[precioTotal])
-
   return(
     <>
       <AppBar position="static" sx={{backgroundColor:"white"}}>
@@ -233,7 +233,7 @@ useEffect(()=>{
             <CardMedia 
             component="img"
             height="150px"
-            image={item.datos?.image}
+            image={item.datos.image}
             sx={{
               width:"50%",
               height:"50%",
@@ -243,12 +243,12 @@ useEffect(()=>{
             }}
             />
             <CardContent className="text-center">
-              <Typography variant="body2" color="initial">{item.datos?.title}</Typography>
-              <Typography variant="body1" sx={{fontWeight:"bold"}}>${item.datos?.price}</Typography>
-              <DeleteOutlineIcon color="primary" onClick={()=>handleDelete(item.datos?.title,index,item.datos?.price)}/>
+              <Typography variant="body2" color="initial">{item.datos.title}</Typography>
+              <Typography variant="body1" sx={{fontWeight:"bold"}}>${item.datos.price}</Typography>
+              <DeleteOutlineIcon color="primary" onClick={()=>handleDelete(item.datos.title,index,item.datos.price)}/>
             </CardContent>
             <CardActions sx={{clear:"both"}}>
-              <Aagregar onResta={()=>handleResta(item.datos?.price)} miTotal={item.datos?.price} miProducto={item.datos?.title} onSuma={()=>handleSuma(item.datos.price)}/>
+              <Aagregar onResta={()=>handleResta(item.datos.price)} miTotal={item.datos.price} miProducto={item.datos.title} onSuma={()=>handleSuma(item.datos.price)}/>
             </CardActions>
             <Divider/>
           </Card>

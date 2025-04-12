@@ -433,12 +433,12 @@ router.post("/register",[
      
    })
    router.patch("/change-password",autenticationToken,[
-     body("email")
+     body("currentPassword")
      .trim()
      .notEmpty().withMessage("Completar este campo")
      ],async(req,res)=>{
        const errors=await validationResult(req);
-       if(!errors.notEmpty()){
+       if(!errors.isEmpty()){
          return res.status(400).json({errors:errors.array()})
        }
        try{

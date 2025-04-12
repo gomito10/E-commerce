@@ -13,7 +13,7 @@ const userSchema=new mongoose.Schema({
     type:String,
     match:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
     trim:true,
-    uniqie:true
+    unique:true
   },
   dni:{
     type:Number,
