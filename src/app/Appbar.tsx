@@ -63,7 +63,7 @@ setTotales(t=>{
         <Button variant="outlined" size="small" color="secondary" onClick={()=>handleSuma()}>+</Button>
          <Typography>{JSON.parse(localStorage.getItem(miProducto))?.contador||1}</Typography>
         <Button variant="outlined" color="success" onClick={()=>handleResta()} size="small">-</Button>
-        <Typography variant="h5" className="font-extrabold">${JSON.parse(localStorage.getItem(miProducto))?.total||miTotal}</Typography>
+        <Typography variant="h5" className="font-extrabold">${Number(JSON.parse(localStorage.getItem(miProducto))?.total||miTotal).toFixed(2)}</Typography>
         </Box>
       </>
     )
@@ -254,7 +254,7 @@ useEffect(()=>{
           </Card>
         ))):<h1>No hay productos selecciionados</h1>
         }
-        <Typography variant="h5" className="text-white bg-violet-700 w-full">Total: {JSON.parse(localStorage.getItem("pagar"))||0}</Typography>
+        <Typography variant="h5" className="text-white bg-violet-700 w-full">Total: {Number(JSON.parse(localStorage.getItem("pagar"))).toFixed(2)||0}</Typography>
         </Box>
       </Drawer>
 

@@ -221,7 +221,7 @@ const MisDatos=forwardRef((props,ref)=>{
    if(!response.ok){
       alert("datos incorrectos")
     }
-    const result=await responsejson();
+    const result=await response.json();
     console.log(result);
   }
   
@@ -241,16 +241,16 @@ const MisDatos=forwardRef((props,ref)=>{
       <Box className="bg-white py-3">
           <List>
             <ListItem>
-              <ListItemText>5
-                <Typography variant="body1" color="initia65l" className="font-bold">Nombre</Typography>
-                <Typography variant="body2" className="text-gray-500" >{datausername}</Typography>
+              <ListItemText>
+                <Typography variant="body1" color="initial" className="font-bold">Nombre</Typography>
+                <Typography variant="body2" className="text-gray-500" >{data.username}</Typography>
               </ListItemText>
               </ListItem>
                           <ListItem>
-              <ListItemText>555
-                <Typography vari555ant="body1" color="initial6" className="font-bold">65Apellido</555Ty6pography65666554>
-                <Typo5graphy variant="body2" className="text-gray-500">{data.apellido}</Typography>
-       676g5       </ListItemText>
+              <ListItemText>
+                <Typography variant="body1" color="initial" className="font-bold">Apellido</Typography>
+                <Typography variant="body2" className="text-gray-500">{data.apellido}</Typography>
+              </ListItemText>
               </ListItem>
             <ListItem>
               <ListItemText>

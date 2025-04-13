@@ -52,7 +52,7 @@ router.post("/register",[
     }),
     body("dni")
     .trim()
-    .notEmpty().withMessage("Completar este campo")
+    .notEmpty().withMessage("Completar el campo")
     .isNumeric().withMessage("Debe contener valores numéricos"),
     body("email")
     .trim()
@@ -509,7 +509,7 @@ router.post("/register",[
      const usuarioId=req.user.id;
      const sessionId=req.user.sessionId;
      await client.set(`blackList:${token}`,"",{EX:tiempoRestante});
-     {/*await client.sRem(`sessions:${usuarioId}`,sessionId);*/}
+     await client.sRem(`sessions:${usuarioId}`,sessionId);
      res.status(200).json({message:"sesión cerrada correctamente",usuario:username.usuario})
    }catch(error){
      res.status(500).json({error:"Error al intentar cerrar sesión",message:error.message})
