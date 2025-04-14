@@ -221,18 +221,22 @@ const MisDatos=forwardRef((props,ref)=>{
   const[data,setData]=useState({});
   const{token}=useContext(crearContexto)
   const[nombre,setNombre]=useState("")
+  const[name,setName]=useState(data?.username || "")
+  const[update,setUpdate]=useState(0)
   const{register,watch,handleSubmit}=useForm()
-  
+  const router=useRouter()
   const fetchData=async ()=>{
     try{
     const response=await fetch("http://localhost:4000/datos",{
       method:"GET",
       headers:{
-        Authorization:`Bearer ${token}`
+        Authorization:`Bearer ${token}`,
+        "Cache-Control":"no-cache",
       }
     });
     const result=await response.json();
     setData(result)
+    setName(result.username)
     }catch(error){
       console.error("Error de usuario en datos")
     }
@@ -254,18 +258,20 @@ const MisDatos=forwardRef((props,ref)=>{
       alert("datos incorrectos")
     }
     const result=await response.json();
-    console.log(result);
-    
+    setUpdate(p=>p+1)
+    setData(result)
+    console.log(data);
+    setOpen(!open)
   }
   
   useEffect(()=>{
-    
     fetchData()
-  },[data])
-  
+  },[])
+ 
+ 
   const usuario=watch("username")
   return(
-    <Container className="py-3 shrink-0 bg-gray-100" id="/perfil" ref={ref} id="x">
+    <Container className="py-3 shrink-0 bg-gray-100" id="/perfil" ref={ref} id={data.id}>
       <IconButton onClick={handleBack}>
         <KeyboardBackspaceIcon color="secondary"/>
         <Typography variant="body2" color="secondary">Volver</Typography>
@@ -276,31 +282,31 @@ const MisDatos=forwardRef((props,ref)=>{
             <ListItem>
               <ListItemText>
                 <Typography variant="body1" color="initial" className="font-bold">Nombre</Typography>
-                <Typography variant="body2" className="text-gray-500" >{data.username}</Typography>
+                <Typography variant="body2" className="text-gray-500" >{name}</Typography>
               </ListItemText>
               </ListItem>
                           <ListItem>
               <ListItemText>
                 <Typography variant="body1" color="initial" className="font-bold">Apellido</Typography>
-                <Typography variant="body2" className="text-gray-500">{data.apellido}</Typography>
+                <Typography variant="body2" className="text-gray-500">{apellido}</Typography>
               </ListItemText>
               </ListItem>
             <ListItem>
               <ListItemText>
                 <Typography variant="body1" color="initial" className="font-bold">Email</Typography>
-                <Typography variant="body2" className="text-gray-500">{data.email}</Typography>
+                <Typography variant="body2" className="text-gray-500">{email}</Typography>
               </ListItemText>
               </ListItem>
             <ListItem>
               <ListItemText>
                 <Typography variant="body1" color="initial" className="font-bold">Dni</Typography>
-                <Typography variant="body2" className="text-gray-500">{data.documento}</Typography>
+                <Typography variant="body2" className="text-gray-500">{documento}</Typography>
               </ListItemText>
               </ListItem>
             <ListItem>
               <ListItemText>
                 <Typography variant="body1" color="initial" className="font-bold">Teléfono</Typography>
-                <Typography variant="body2" className="text-gray-500">{data.tel}</Typography>
+                <Typography variant="body2" className="text-gray-500">{tel}</Typography>
               </ListItemText>
               </ListItem>
           </List>
@@ -316,9 +322,9 @@ const MisDatos=forwardRef((props,ref)=>{
             <form onSubmit={handleSubmit(onSubmit)}>
             <InputLabel htmlFor="nombre" className="font-bold">Nombre</InputLabel>
             
-            <TextField color="primary" variant="outlined" type="text" fullWidth id="nombre" {...register("nombre")} defaultValue={data.username}/>
+            <TextField color="primary" variant="outlined" type="text" fullWidth id="nombre" {...register("nombre")} value={name} onChange={(e)=>setName(e.target.value)}/>
             <InputLabel htmlFor="apellido" className="font-bold mt-5">Apellido</InputLabel>
-            <TextField color="primary" variant="outlined" defaultValue={data.apellido} type="text" id="apellido" {...register("apellido")}/>
+            <TextField color="primary" variant="outlined" value={apellido} type="text" id="apellido" {...register("apellido")} onChange={(e)=>setApellido}/>
             <InputLabel htmlFor="email" className="font-bold mt-5">Email</InputLabel>
             <TextField color="primary" variant="outlined" defaultValue={data.email} type="email" id="email" {...register("email")}/>
             <InputLabel htmlFor=" dni" className="font-bold mt-5">DNI</InputLabel>
