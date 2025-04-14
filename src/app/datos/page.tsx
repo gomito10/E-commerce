@@ -78,7 +78,7 @@ import {useForm} from "react-hook-form"
        </Container>
      )
  }
-function Direction(){
+const Direction=forwardRef((props,ref)=>{
   const[open,setOpen]=useState(false);
   const{
     register
@@ -90,8 +90,19 @@ function Direction(){
     });
     window.scrollTo(0,0)
   }
+  function handleBack(){
+    document.getElementById("datos").scrollIntoView({
+      behavior:"auto",
+      block:"end"
+    });
+    window.scrollTo(0,0)
+  }
   return(
-      <Container>
+      <Container ref={ref} className="shrink-0">
+        <IconButton onClick={handleBack}>
+          <KeyboardBackspaceIcon color="secondary"/>
+          <Typography variant="body2" color="secondary">Volver</Typography>
+        </IconButton>
         <Typography variant="body1" color="initial" className="font-bold">Direcciones</Typography>
         <Button variant="contained" color="secondary" className="my-10" onClick={()=>setOpen(!open)}>Agregar dirección</Button>
         <Paper className="w-full p-10" elevation={7}>
@@ -116,8 +127,8 @@ function Direction(){
         </Dialog>
       </Container>
     )
-}
-function Autenticacion(){
+})
+const Autenticacion=forwardRef((props,ref)=>{
   const[open,setOpen]=useState(false);
   const{
   handleSubmit,
@@ -131,8 +142,16 @@ const password=watch("password")
 async function handleChange(){
   await trigger(watch("password"))
 }
+function handleBack(){
+    document.getElementById("datos").scrollIntoView({behavior:"auto",block:"center"})
+    window.scrollTo(0,0)
+}
   return(
-      <Container>
+      <Container ref={ref} className="shrink-0">
+        <IconButton color="secondary" onClick={handleBack}>
+          <KeyboardBackspaceIcon/>
+          <Typography color="secondary">Volver</Typography>
+        </IconButton>
         <Paper className="w-full p-10" elevation={7}>
           <Typography variant="body1" color="initial" className="font-bold">Contraseña</Typography>
           <Typography variant="body1" color="initial" className="mt-5 mb-10">Usted todavía no tiene una contraseña definida</Typography>
@@ -146,7 +165,20 @@ async function handleChange(){
         <Dialog open={open} onClose={()=>setOpen(!open)}>
           <DialogContent>
             <form>
-              <TextField variant="outlined" label="contraseña" {...register("password",{required:"Completar este campo"})} fullWidth error={!!errors.password} color={errors.password ? "error" : "info"}/>
+              <TextField variant="outlined" label="contraseña actúal" {...register("actual",{required:"Completar este campo"})} fullWidth error={!!errors.password} color={errors.password ? "error" : "info"}/>
+              <TextField variant="outlined" label="contraseña" {...register("password",{required:"Completar este campo",minLength:{
+                value:8,
+                message:"Debe contener entre 8 y 20 caracteres"
+              },
+                maxLength:{
+                value:20,
+                message:"Debe contener entre 8 y 20 caracteres"
+              },
+                pattern:{
+                  value:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%+?&])[A-Za-z\d@$!%+?&]{0,}$/,
+                  message:"La contraseña debe tener al menos 1 mayuscula,una minuscula,un numero y un caracter especial"
+                }
+              })} sx={{margin:"10px 0"}}/>
               <TextField variant="outlined" label="confirmar password" {...register("confirm",{required:"Completar este campo"})} fullWidth className="my-5"/>
             </form>
             <Box>
@@ -182,8 +214,8 @@ async function handleChange(){
           </DialogContent>
         </Dialog>
       </Container>
-    )
-}
+)
+})
 const MisDatos=forwardRef((props,ref)=>{
   const[open,setOpen]=useState(false);
   const[data,setData]=useState({});
@@ -206,7 +238,7 @@ const MisDatos=forwardRef((props,ref)=>{
     }
     }
   function handleBack(){
-    document.getElementById("datos").scrollIntoView({behavior:"smooth",block:"center"})
+    document.getElementById("datos").scrollIntoView({behavior:"auto",block:"center"})
     window.scrollTo(0,0)
   }
  async function onSubmit(data){
@@ -223,6 +255,7 @@ const MisDatos=forwardRef((props,ref)=>{
     }
     const result=await response.json();
     console.log(result);
+    
   }
   
   useEffect(()=>{
@@ -232,7 +265,7 @@ const MisDatos=forwardRef((props,ref)=>{
   
   const usuario=watch("username")
   return(
-    <Container className="py-3 shrink-0 bg-gray-100" id="/perfil" ref={ref}>
+    <Container className="py-3 shrink-0 bg-gray-100" id="/perfil" ref={ref} id="x">
       <IconButton onClick={handleBack}>
         <KeyboardBackspaceIcon color="secondary"/>
         <Typography variant="body2" color="secondary">Volver</Typography>
@@ -304,18 +337,31 @@ const MisDatos=forwardRef((props,ref)=>{
 const Datos = () => {
   const[open,setOpen]=useState(false)
   const miref=useRef()
+  const refAutentication=useRef()
+  const refDirection=useRef()
   const opciones=["Datos personales","Autenticación","Direcciones","Saklir"]
   function handleRouter(opcion){
     if(opcion==3){
       setOpen(!open)
       return
     }
-    document.getElementById(opcion).scrollIntoView({behavior:"smooth",block:"center",inline:"center"})
+    if(opcion===0){
+    miref.current.scrollIntoView({behavior:"auto",block:"center",inline:"center"})
     window.scrollTo(0,0)
+    }
+    if(opcion==1){
+      refAutentication.current.scrollIntoView({behavior:"auto",block:"center",inline:"center"})
+    window.scrollTo(0,0)
+    }
+ if(opcion==2){
+      refDirection.current.scrollIntoView({behavior:"auto",block:"center",inline:"center"})
+    window.scrollTo(0,0)
+  
+  }
   }
   return (
     <>
-      <div className="flex overflow-hidden overflow-x-auto">
+      <div className="flex overflow-hidden">
     <Container className="shrink-0" id="datos">
      <Box>
        <Typography variant="h6" color="initial" className="font-bold">Mis datos</Typography>
@@ -335,9 +381,10 @@ const Datos = () => {
     </Box>
     </Container>
      <MisDatos ref={miref}/>
+     <Autenticacion ref={refAutentication}/>
+     <Direction ref={refDirection}/>
     </div>
-    <Autenticacion/>
-    <Direction/>
+
     <NewDirection/>
     <Dialog open={open} onClose={()=>setOpen(!open)}>
       <DialogContent>
