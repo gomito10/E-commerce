@@ -47,7 +47,7 @@ const Cuenta = () => {
           router.push("/datos");
           return
         }else{
-          console.log("No se puede acceder despues denovar el token")
+          console.log("No se puede acceder despues de renovar el token")
         router.push("/login");
         return
       }

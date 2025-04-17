@@ -317,12 +317,12 @@ router.post("/register",[
      .trim()
      .notEmpty().withMessage("Completar este campo")
      .isLength({min:2,max:10}).withMessage("Formato no valido")
-     .isAlpha().withMessage("Debe contener solo caracteres alfabeticos"),
+     .matches(/^[a-zA-Z\u00EO-\u00FC]+$/).withMessage("Debe contener solo caracteres alfabeticos"),
      body("apellido")
      .trim()
-     .notEmpty().withMessage("Completar este campo")
+     .notEmpty().withMessage("Completar el campo")
      .isLength({min:2,max:10}).withMessage("Formato no valido")
-     .isAlpha().withMessage("Debe contener solo caracteres alfabeticos"),
+     .matches(/^[a-zA-Z\u00E0-\u00FC]+$/).withMessage("Debe contener solo caracteres alfabeticos"),
      body("email")
      .trim()
      .notEmpty().withMessage("Completar este campo")
@@ -343,8 +343,16 @@ router.post("/register",[
      try{
      const {nombre,apellido,email,telefono,dni}=req.body;
      const username=await User.findById(req.user.id);
+     const existEmail=await User.findOne({email:email})
+     const existDni=await User.findOne({dni:dni})
      if(!username){
        return res.status(400).json({message:"El usuario no existe"})
+     }
+     if(existEmail && existEmail.email != req.body.email){
+       return res.status(400).json({error:"EMAIL_FOUND",message:"El mail ya se encuentra registrado con otro usuario"})
+     }
+     if(existDni && existDni.dni != req.body.dni){
+       return res.status(400).json({error:"EXIST_DNI",message:`El documento ya se encuentra registrado:${username.dni} nuevo:${req.body.dni}`})
      }
      const objeto={}
       for (let key in req.body){
@@ -367,7 +375,7 @@ router.post("/register",[
          
   }catch(error){
        if(error.code===11000){
-         return res.status(500).json({error:"El ususrio ya existe",message:error.message})
+         return res.status(500).json({error:"El usuario ya existe",message:error.message})
        }
        res.status(400).json({error:"Error en el servidor al actualizar datos en mi ruta /patch",message:error.message
      })
@@ -435,21 +443,39 @@ router.post("/register",[
    router.patch("/change-password",autenticationToken,[
      body("currentPassword")
      .trim()
+     .notEmpty().withMessage("Completar este campo"),
+     body("newPassword")
+     .trim()
      .notEmpty().withMessage("Completar este campo")
+     .isLength({min:8,max:20}).withMessage("Debe contener entre 8 y 20 caracteres")
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%+?&])[A-Za-z\d@$!%+?&]{0,}$/).withMessage("La contraseña debe tener al menos 1 mayuscula,una minuscula,un numero y un caracter especial"),
+    body("confirmPassword")
+    .trim()
+    .notEmpty().withMessage("Completar este campo")
+    .custom((value,{req})=>{
+      if(value !== req.body.newPassword){
+        throw new Error("Las contraseñas no coinciden")
+      }
+      return true
+    }),
      ],async(req,res)=>{
        const errors=await validationResult(req);
        if(!errors.isEmpty()){
          return res.status(400).json({errors:errors.array()})
        }
        try{
-         const{currentPassword,newPassword}=req.body;
+         const{currentPassword,newPassword,confirmPassword}=req.body;
          const username=await User.findById(req.user.id);
          if(!username){
            res.status(400).json({message:"El usuario no existe"});
          }
          const isValidPassword=await bcrypt.compare(currentPassword,username.password);
-         if(isValidPassword){
-           res.json({message:"La contraseña no puede ser la misma q la actual"})
+         const updatePassword=await bcrypt.compare(newPassword,username.password);
+         if(updatePassword){
+           return res.json({message:"La contraseña no puede ser la misma q la actual"})
+         }
+         if(!isValidPassword){
+           return res.status(400).json({message:"La contraseña es incorrecta"})
          }
          const hashNewPassword=await bcrypt.hash(newPassword,10);
          await User.findByIdAndUpdate(req.user.id,{password:hashNewPassword});

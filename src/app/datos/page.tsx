@@ -146,6 +146,35 @@ function handleBack(){
     document.getElementById("datos").scrollIntoView({behavior:"auto",block:"center"})
     window.scrollTo(0,0)
 }
+async function onSubmit(data){
+  try{
+    const response=await fetch("http://localhost:4000/change-password",{
+      method:"PATCH",
+      headers:{
+        "Content-Type":"application/json",
+        Authorization:`Bearer ${token}`
+      },
+      body:JSON.stringify(data)
+    });
+    if(!response.ok){
+      const result=await response.json();
+      console.log(result.error)
+      return
+    }
+    const result=response.json();
+    if(result.errors){
+        result.errors.forEach((error)=>{
+          setError(error.path,{
+            type:"manual",message:error.msg
+          })
+        })
+      }else{
+        setOpen(!open);
+      }
+  }catch(error){
+    alert("Error en el servidor al Modificar la contraseña")
+  }
+}
   return(
       <Container ref={ref} className="shrink-0">
         <IconButton color="secondary" onClick={handleBack}>
@@ -164,9 +193,9 @@ function handleBack(){
         </Paper>
         <Dialog open={open} onClose={()=>setOpen(!open)}>
           <DialogContent>
-            <form>
-              <TextField variant="outlined" label="contraseña actúal" {...register("actual",{required:"Completar este campo"})} fullWidth error={!!errors.password} color={errors.password ? "error" : "info"}/>
-              <TextField variant="outlined" label="contraseña" {...register("password",{required:"Completar este campo",minLength:{
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <TextField variant="outlined" label="contraseña actúal" {...register("currentPassword",{required:"Completar este campo"})} fullWidth error={!!errors.currentPassword} color={errors.password ? "error" : "info"} helperText={errors.currentPassword && errors.currentPassword.message} error={!!errors.currentPassword}/>
+              <TextField variant="outlined" label="contraseña" {...register("newPassword",{required:"Completar este campo",minLength:{
                 value:8,
                 message:"Debe contener entre 8 y 20 caracteres"
               },
@@ -178,8 +207,9 @@ function handleBack(){
                   value:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%+?&])[A-Za-z\d@$!%+?&]{0,}$/,
                   message:"La contraseña debe tener al menos 1 mayuscula,una minuscula,un numero y un caracter especial"
                 }
-              })} sx={{margin:"10px 0"}}/>
-              <TextField variant="outlined" label="confirmar password" {...register("confirm",{required:"Completar este campo"})} fullWidth className="my-5"/>
+              })} sx={{margin:"10px 0"}} fullWidth helperText={errors.newPassword && errors.newPassword.message} error={!!errors.newPassword} color={errors.newPassword ? "error" : "primary"}/>
+              <TextField variant="outlined" label="confirmar password" {...register("confirmPassword",{required:"Completar este campo"})} fullWidth className="my-5" helperText={errors.confirmPassword && errors.confirmPassword.message}  error={!!errors.confirmPassword} color={errors.confirmPassword ? "error" : "primary"}/>
+              <Button type="submit" variant="contained" color="secondary" fullWidth>Modificar contraseña</Button>
             </form>
             <Box>
               <Stack direction="row">
@@ -220,10 +250,14 @@ const MisDatos=forwardRef((props,ref)=>{
   const[open,setOpen]=useState(false);
   const[data,setData]=useState({});
   const{token}=useContext(crearContexto)
-  const[nombre,setNombre]=useState("")
-  const[name,setName]=useState(data?.username || "")
+  //const[nombre,setNombre]=useState("")
+  const[name,setName]=useState(data?.username || "");
+  const[apellido,setApellido]=useState(data?.apellido || "");
+  const[email,setEmail]=useState(data?.email|| "");
+  const[documento,setDocumento]=useState(data?.dni || "");
+  const[tel,setTel]=useState(data?.tel || "");
   const[update,setUpdate]=useState(0)
-  const{register,watch,handleSubmit}=useForm()
+  const{register,watch,handleSubmit,formState:{errors},setError}=useForm()
   const router=useRouter()
   const fetchData=async ()=>{
     try{
@@ -237,6 +271,10 @@ const MisDatos=forwardRef((props,ref)=>{
     const result=await response.json();
     setData(result)
     setName(result.username)
+    setApellido(result.apellido)
+    setEmail(result.email)
+    setTel(result.tel)
+    setDocumento(result.documento)
     }catch(error){
       console.error("Error de usuario en datos")
     }
@@ -246,6 +284,7 @@ const MisDatos=forwardRef((props,ref)=>{
     window.scrollTo(0,0)
   }
  async function onSubmit(data){
+   try{
     const response=await fetch("http://localhost:4000/datos",{
       method:"PATCH",
       headers:{
@@ -254,16 +293,31 @@ const MisDatos=forwardRef((props,ref)=>{
       },
       body:JSON.stringify(data)
     })
-   if(!response.ok){
-      alert("datos incorrectos")
-    }
+    
     const result=await response.json();
-    setUpdate(p=>p+1)
-    setData(result)
+    if(!response.ok){
+      if(result.error){
+        alert("El correo ya se encuentra registrado con otro usuario")
+      return
+      }
+    }
+    
+    if(result.errors){
+        result.errors.forEach((error)=>{
+          setError(error.path,{
+            type:"manual",message:error.msg
+          })
+        })
+      }else{
+    //setData(result)
+    alert("Datos modificados correctamente")
     console.log(data);
     setOpen(!open)
-  }
-  
+      }
+ }catch(error){
+   alert("Error en el servidor al enviar los datos para actualización")
+ }
+}
   useEffect(()=>{
     fetchData()
   },[])
@@ -271,7 +325,7 @@ const MisDatos=forwardRef((props,ref)=>{
  
   const usuario=watch("username")
   return(
-    <Container className="py-3 shrink-0 bg-gray-100" id="/perfil" ref={ref} id={data.id}>
+    <Container className="py-3 shrink-0 bg-gray-100" id="/perfil" ref={ref}>
       <IconButton onClick={handleBack}>
         <KeyboardBackspaceIcon color="secondary"/>
         <Typography variant="body2" color="secondary">Volver</Typography>
@@ -322,15 +376,32 @@ const MisDatos=forwardRef((props,ref)=>{
             <form onSubmit={handleSubmit(onSubmit)}>
             <InputLabel htmlFor="nombre" className="font-bold">Nombre</InputLabel>
             
-            <TextField color="primary" variant="outlined" type="text" fullWidth id="nombre" {...register("nombre")} value={name} onChange={(e)=>setName(e.target.value)}/>
+            <TextField color="primary" variant="outlined" type="text" fullWidth id="nombre" {...register("nombre")} value={name} onChange={(e)=>setName(e.target.value)}
+            helperText={errors.nombre && errors.nombre.message}
+            error={!!errors.nombre}
+            color={errors.nombre ? "error" : "primary"}
+            />
             <InputLabel htmlFor="apellido" className="font-bold mt-5">Apellido</InputLabel>
-            <TextField color="primary" variant="outlined" value={apellido} type="text" id="apellido" {...register("apellido")} onChange={(e)=>setApellido}/>
+            <TextField color="primary" variant="outlined" value={apellido} type="text" id="apellido" {...register("apellido")} onChange={(e)=>setApellido(e.target.value)}
+            helperText={errors.apellido && errors.apellido.message}
+            error={!!errors.apellido}
+            color={errors.apellido ? "error" : "primary"}
+            />
             <InputLabel htmlFor="email" className="font-bold mt-5">Email</InputLabel>
-            <TextField color="primary" variant="outlined" defaultValue={data.email} type="email" id="email" {...register("email")}/>
+            <TextField color="primary" variant="outlined" value={email} type="email" id="email" {...register("email",{pattern:{
+              value:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+              message:"Formato no valido"
+            }})} onChange={(e)=>setEmail(e.target.value)}
+            helperText={errors.email && errors.email.message}
+            error={!!errors.email}
+            color={errors.email ? "error" : "primary"}
+            />
             <InputLabel htmlFor=" dni" className="font-bold mt-5">DNI</InputLabel>
-            <TextField color="primary" variant="outlined" defaultValue={data.documento} type="number" id="dni" {...register("dni")}/>
+            <TextField color="primary" variant="outlined" value={documento} type="number" id="dni" {...register("dni")} readOnly
+            />
+            {data.error}
             <InputLabel htmlFor="telefono" className="font-bold mt-5">Teléfono</InputLabel>
-            <TextField color="primary" variant="outlined" defaultValue={data.tel} type="text" id="telefono" {...register("telefono")}/>
+            <TextField color="primary" variant="outlined" value={tel} type="text" id="telefono" {...register("telefono")} onChange={(e)=>setTel(e.target.value)} type="number" helperText={errors.telefono && errors.telefono.message} error={!!errors.telefono} color={errors.telefono ? "error" : "primary"}/>
             <Button variant="contained" color="secondary" fullWidth type="submit">
             Guardar cambios
           </Button>
